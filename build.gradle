@@ -1,0 +1,37 @@
+Groovy
+plugins {
+    id 'java'
+}
+
+group = 'de.harich.thilo'
+version = '1.0-SNAPSHOT'
+
+// Nutze Java 21 für die besten AVX-512 Features
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+// Ermöglicht die Nutzung der Vector-API für AVX-512
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "--add-modules=jdk.incubator.vector"
+}
+
+tasks.withType(JavaExec) {
+    jvmArgs += ["--add-modules=jdk.incubator.vector"]
+}
+
+test {
+    useJUnitPlatform()
+}
