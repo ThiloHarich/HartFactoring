@@ -1,19 +1,16 @@
 package de.harich.thilo.factoring.hart;
 
 import de.harich.thilo.factoring.FactorisationAlgorithm;
-import de.harich.thilo.factoring.Factorization;
 import de.harich.thilo.factoring.Factor;
 import de.harich.thilo.factoring.hart.calculator.Mod32TableSquareAdjuster;
 import de.harich.thilo.factoring.hart.calculator.MultiplierArraySquareSubtraction;
 import de.harich.thilo.factoring.hart.calculator.educational.SquareAdjuster;
 import de.harich.thilo.factoring.hart.calculator.educational.SquareSubtraction;
-import de.harich.thilo.factoring.trialdivision.TrialDivisionAlgorithm;
+import de.harich.thilo.factoring.trialdivision.LemireTrialDivision;
 import de.harich.thilo.math.BinaryGreatestCommonDivisorEngine;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static de.harich.thilo.factoring.Factorization.isPrimeFactorisation;
 
 /**
  * A clean code Approach for a Hart Factoring algorithm running in O(n^1/3).
@@ -65,12 +62,12 @@ import static de.harich.thilo.factoring.Factorization.isPrimeFactorisation;
  * It seems like some multipliers are needed despite some arguments questioning this.
  *
  */
-public class HartFactorizationAlgorithm implements FactorisationAlgorithm {
+public class HartFactorization implements FactorisationAlgorithm {
 
 
-    static final int limitMightHelpFactorisation = 1 << 21;
+    static int limitMightHelpFactorisation = 1 << 21;
 
-    TrialDivisionAlgorithm trialDivisionAlgorithm = new TrialDivisionAlgorithm();
+    LemireTrialDivision trialDivisionAlgorithm = new LemireTrialDivision();
     BinaryGreatestCommonDivisorEngine greatestCommonDivisorEngine = new BinaryGreatestCommonDivisorEngine();
 
     // use decomposition not Inheritance,
@@ -83,7 +80,7 @@ public class HartFactorizationAlgorithm implements FactorisationAlgorithm {
     /**
      * The constructor with best performance
      */
-    public HartFactorizationAlgorithm() {
+    public HartFactorization() {
         this.calculator = new MultiplierArraySquareSubtraction(true, 43);
         this.calculator.initialize();
 
@@ -94,7 +91,7 @@ public class HartFactorizationAlgorithm implements FactorisationAlgorithm {
     /**
      * For demonstration/testing purposes, where you might define some not so performant Implementations
      */
-    public HartFactorizationAlgorithm(SquareSubtraction calculator, SquareAdjuster squareAdjuster) {
+    public HartFactorization(SquareSubtraction calculator, SquareAdjuster squareAdjuster) {
         this.calculator = calculator;
         this.calculator.initialize();
 //        this.calculator.useFusedMultipleAdd();
@@ -109,32 +106,30 @@ public class HartFactorizationAlgorithm implements FactorisationAlgorithm {
     /**
      * This is the main method for calculating a prime factorisation.
      * The implementation has to return a list of factors such that the absolut value of the elements in the list multiplied together
-     * must be the numberToFactorize. The prime factors were marked with a negative sign and should be at the beginning
-     * of the list.
+     * must be the numberToFactorize.
      */
     public List<Factor> findFactors(long numberToFactorize) {
-        List<Factor> factors = trialDivisionAlgorithm.findFactors(numberToFactorize, (int) Math.cbrt(numberToFactorize));
-        if (isPrimeFactorisation(factors))
-            return factors;
-
-        try {
-            long numberWithoutSmallPrimeFactors = Factorization.getNonPrimeFactorValue(factors);
-            long factor = findSingleFactor(numberWithoutSmallPrimeFactors);
-            long remainingNumber = numberWithoutSmallPrimeFactors / factor;
-            factors.add(new Factor(factor));
-            factors.add(new Factor(remainingNumber));
-
-            return factors;
-        } catch (final RuntimeException e) {
-            handleRuntimeException(numberToFactorize, e);
-            // no factor can be found
-            return new ArrayList<>();
+        List<Factor> factors = new ArrayList<>();
+        long primeFactor1 = findSingleFactor(numberToFactorize, true);
+        if (primeFactor1 > 1){
+            factors.add(new Factor(primeFactor1));
         }
+        long primeFactor2 = numberToFactorize / Math.abs(primeFactor1);
+        if (primeFactor2 != 1){
+            factors.add(new Factor(primeFactor2));
+        }
+        return factors;
+    }
+    public long findSingleFactor(final long numberToFactorize) {
+        return findSingleFactor(numberToFactorize, false);
     }
 
-    public long findSingleFactor(final long numberToFactorize) {
+    public long findSingleFactor(final long numberToFactorize, boolean stopIfNeeded) {
         final long fourN = 4 * numberToFactorize;
         final double sqrt4N = Math.sqrt(fourN);
+        if (stopIfNeeded){
+            limitMightHelpFactorisation = (int) Math.cbrt(numberToFactorize) + 1;
+        }
 
         // this loop is pretty simple and has no branches except, when we find the solution,
         // this makes it a good candidate for parallel processing. In Java we can let the JIT compiler do the work
@@ -175,14 +170,4 @@ public class HartFactorizationAlgorithm implements FactorisationAlgorithm {
         return -1;
     }
 
-    public void handleRuntimeException(long numberToFactorize, RuntimeException e) {
-        System.out.println("Failed to factor N =" + numberToFactorize +
-                ". " + numberToFactorize + " might have factors < below " + Math.ceil(Math.cbrt(numberToFactorize)) +
-                " (n^1/3) -> add handling in findSmallFactor, the array for the stored square roots is too small " +
-                "-> increase value of MULTIPLIERS_LIMIT_50_BIT, or the number is a square -> add handling in findSmallFactor");
-        System.out.println("Exception is : " + e.getLocalizedMessage());
-    }
-    public SquareSubtraction getCalculator() {
-        return calculator;
-    }
 }

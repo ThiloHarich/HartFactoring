@@ -1,7 +1,8 @@
 package de.harich.thilo.factoring;
 
 
-import de.harich.thilo.factoring.trialdivision.TrialDivisionAlgorithm;
+import de.harich.thilo.factoring.hart.HartFactorization;
+import de.harich.thilo.factoring.trialdivision.LemireTrialDivision;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -15,28 +16,26 @@ import static de.harich.thilo.factoring.Factor.createPrimeFactor;
  * TODO make an CLI interface to factorize a buch of number
  */
 public class Factorization {
-
-
-    Map<Integer, List<Factor>> factorizations = new HashMap<>();
-
+    Map<Long, List<Factor>> factorizations = new HashMap<>();
 
     public Factorization() {
         List<Factor> factorizationOf1 = new ArrayList<>(List.of());
-        factorizations.put(1, factorizationOf1);
+        factorizations.put(1L, factorizationOf1);
     }
     //    HartFactorizationAlgorithm algorithm = new HartFactorizationAlgorithm(new AdjustXModPow2Calculator());
-    TrialDivisionAlgorithm algorithm = new TrialDivisionAlgorithm();
+    LemireTrialDivision smallFactorsAlgorithm = new LemireTrialDivision();
+    HartFactorization biggerFactorsAlgorithm = new HartFactorization();
 
     public static boolean isPrimeFactorisation(List<Factor> smallFactors) {
         return smallFactors.stream().allMatch(Factor::isPrimeFactor);
     }
 
     public static long getNonPrimeFactorValue(List<Factor> factors) {
-        return factors.stream().filter(Factor::isNonPrimeFactor).findFirst().map(f -> (Long) f.value).orElse(Long.valueOf(1L));
+        return factors.stream().filter(Factor::isNonPrimeFactor).findFirst().map(f -> f.value).orElse(Long.valueOf(1L));
     }
 
     public static List<Long> getNonPrimeFactorValues(List<Factor> factors) {
-        return factors.stream().filter(Factor::isNonPrimeFactor).map(f -> (Long) f.value).collect(Collectors.toList());
+        return factors.stream().filter(Factor::isNonPrimeFactor).map(f -> f.value).collect(Collectors.toList());
     }
 
     public static List<Factor> combineIdenticalFactors(List<Factor> sortedFactors) {
@@ -114,43 +113,93 @@ public class Factorization {
     }
 
     public List<Factor> getSortedPrimeFactorsWithExponent(int number, int maxPrimeFactor) {
-        return getPrimeFactors(number, maxPrimeFactor);
-//        List<Factor> factors = getPrimeFactors(number, maxPrimeFactor);
-//        Collections.sort(factors);
-//        return combineIdenticalFactors(factors);
+        List<Factor> factors = getPrimeFactors(number, maxPrimeFactor);
+        Collections.sort(factors);
+        return combineIdenticalFactors(factors);
     }
 
 
-    private List<Factor> getPrimeFactors(int number, int maxPrimeFactor) {
-        if (maxPrimeFactor > 10000 && BigInteger.valueOf(number).isProbablePrime(10)) {
+    private List<Factor> getPrimeFactors(long number, int maxLowerPrimeFactor) {
+        if (maxLowerPrimeFactor > 10000 && BigInteger.valueOf(number).isProbablePrime(10)) {
             return new ArrayList<>(List.of(createPrimeFactor(number)));
         }
-//        List<Factor> factors = algorithm.findFactors(number, maxPrimeFactor);
-        int factor = algorithm.findSingleFactor(number, maxPrimeFactor);
-        if (factor == -1) {
-            return new ArrayList<>(Collections.emptyList());
-        }
-        int numberDivFactor = number / factor;
-        List<Factor> deepCopyOfExistingFactors;
-        if (factorizations.containsKey(numberDivFactor)){
+        long[] factors = smallFactorsAlgorithm.findFactors(number, maxLowerPrimeFactor);
+        List<Factor> smallPrimeFactorList = new ArrayList<>();
+        number = addSmallFactors(number, factors, smallPrimeFactorList);
+        // the following steps only help for small factors, but why not
+        // try to find the remaining factor in the factorisation cache
+        if (factorizations.containsKey(number)){
             // do a deep copy of Factors, to not mess up the already computed factorization
             // eigentlich müssen wir nur an dem Factor mit value == factor den exponenten erhöhen
-            deepCopyOfExistingFactors = factorizations.get(numberDivFactor).stream()
+            List<Factor> deepCopyOfExistingFactors = factorizations.get(number).stream()
                     .map(Factor::new)
                     .collect(Collectors.toCollection(ArrayList::new));
+            smallPrimeFactorList.addAll(deepCopyOfExistingFactors);
+            return smallPrimeFactorList;
         }
-        else {
-            // should not happen, when we call it correctly
-            deepCopyOfExistingFactors = getPrimeFactors(numberDivFactor, maxPrimeFactor);
+        // try to find the remaining factor in the primes created in the MontgomeryTrialDivisionAlgorithm
+        int foundIndex = Arrays.binarySearch(LemireTrialDivision.primes, (int) number);
+        if (foundIndex > 0) {
+            Factor foundPrime = new Factor(LemireTrialDivision.primes[foundIndex]);
+            smallPrimeFactorList.add(foundPrime);
+            return smallPrimeFactorList;
         }
-        List<Factor> factorisation = addFactor(deepCopyOfExistingFactors, factor);
-        factorizations.put(number, factorisation);
-        return factorisation;
+        // check for squares
+        if (isPerfectSquare(number)){
+            long sqrt = (long) Math.sqrt(number);
+            smallPrimeFactorList.add(Factor.createPrimeFactor(sqrt, 2));
+            return smallPrimeFactorList;
+        }
+        List<Factor> biggerFactors = biggerFactorsAlgorithm.findFactors(number);
 
-//        return getSortedPrimeFactorsWithExponent(number, maxPrimeFactor);
+        if (maxLowerPrimeFactor >= Math.cbrt(number))
+            // if maxLowerPrimeFactor > n^1/3 numberDivFactor is either a prime or has two different prime factors
+            // each >= n^1/3
+            smallPrimeFactorList.addAll(biggerFactors);
+        else{
+            // recursive call
+            List<Factor> primeFactors = getPrimeFactors(biggerFactors);
+            smallPrimeFactorList.addAll(primeFactors);
+        }
+        return smallPrimeFactorList;
     }
 
-    public List<Factor> addFactor(List<Factor> smallFactorization, int factor) {
+    private static long addSmallFactors(long number, long[] factors, List<Factor> smallPrimeFactorList) {
+        for (long factor : factors){
+            if (factor == 0)
+                break;
+            boolean goOn = false;
+            do {
+                // TODO use reciprocal
+                long numberDivFactor = number / factor;
+                long numberMaybe = numberDivFactor * factor;
+                if (number == numberMaybe) {
+                    smallPrimeFactorList.add(new Factor(factor));
+                    number = numberDivFactor;
+                    goOn = true;
+                }
+                else {
+                    goOn = false;
+                }
+            } while (goOn);
+        }
+        return number;
+    }
+
+
+    public static boolean isPerfectSquare(long n) {
+        if (n < 0) return false;
+        // Die letzten 4 Bits einer Quadratzahl in Hex sind nur 0, 1, 4, 9
+        long h = n & 0xF;
+        if (h > 9) return false;
+        if (h != 2 && h != 3 && h != 5 && h != 6 && h != 7 && h != 8) {
+            long t = (long) Math.sqrt(n);
+            return t * t == n;
+        }
+        return false;
+    }
+
+    public List<Factor> addFactor(List<Factor> smallFactorization, long factor) {
         // 1. Suche nach dem Index des Faktors unter Berücksichtigung von "value"
         // Wir nutzen eine einfache Schleife oder binarySearch
         int insertIndex = -1;

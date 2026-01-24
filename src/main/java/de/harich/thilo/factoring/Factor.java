@@ -10,8 +10,8 @@ public class Factor implements Comparable<Factor>{
 
     @Override
     public String toString() {
-        return value +  "^" + exponent;
-//        return value + (exponent > 1 ? "^" + exponent : "");
+//        return value +  "^" + exponent;
+        return value + (exponent > 1 ? "^" + exponent : "");
     }
 
     public long value;
