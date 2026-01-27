@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.trialdivision;
+package de.harich.thilo.factoring.trialdivision.education;
 
 /**
  * We use the Lemire trick to check if a int values is dividable by a number.
@@ -9,23 +9,23 @@ package de.harich.thilo.factoring.trialdivision;
  * In reality, we see a speedup over LemireTrialDivision of 50%.
  * This is the fastest trial division algorithm working only on int values
  */
-public class LemireIntTrialDivision extends LemireTrialDivision {
+public class LemireIntInheritTrialDivision extends LemireInheritTrialDivision {
 
-    static int[] modularInverse;
-    static int[] limitIfDividable;
+    private static int[] modularInverseInt;
+    private static int[] limitIfDividableInt;
 
     protected void ensureLemireDataExists() {
-        if (modularInverse == null || modularInverse.length != primes.length) {
-            modularInverse = new int[primes.length];
-            limitIfDividable = new int[primes.length];
+        if (modularInverseInt == null || modularInverseInt.length != primes.length) {
+            modularInverseInt = new int[primes.length];
+            limitIfDividableInt = new int[primes.length];
             for (int i = 0; i < primes.length; i++) {
                 int prime = primes[i];
                 // calculate modular Inverse for 32 bit by Newton
                 int inv = modularInverseInt(prime);
-                modularInverse[i] = inv;
+                modularInverseInt[i] = inv;
                 // Limit = (2^32 - 1) / prime (Unsigned)
                 // In Java: Integer.divideUnsigned(-1, prime)
-                limitIfDividable[i] = Integer.divideUnsigned(-1, prime);
+                limitIfDividableInt[i] = Integer.divideUnsigned(-1, prime);
             }
         }
     }
@@ -39,13 +39,6 @@ public class LemireIntTrialDivision extends LemireTrialDivision {
         return inverse;
     }
 
-    public boolean factorFound(long number, int primeIndex) {
-        int numberInt = (int) number;
-        // multiply number and primeModularInverted (overflow can happen!)
-        int product = numberInt * modularInverse[primeIndex];
-        boolean isNumberDivideableByPrime = Integer.compareUnsigned(product, limitIfDividable[primeIndex]) <= 0;
-        return isNumberDivideableByPrime;
-    }
 
     public int findSingleFactor(long number, int maxPrimeFactor) {
         // Lemire can not handle even numbers
@@ -69,5 +62,13 @@ public class LemireIntTrialDivision extends LemireTrialDivision {
             if (factorFound (number, ++i))  return getFactor(i);
         }
         return -1;
+    }
+
+    public boolean factorFound(long number, int primeIndex) {
+        int numberInt = (int) number;
+        // multiply number and primeModularInverted (overflow can happen!)
+        int product = numberInt * modularInverseInt[primeIndex];
+        boolean isNumberDivideableByPrime = Integer.compareUnsigned(product, limitIfDividableInt[primeIndex]) <= 0;
+        return isNumberDivideableByPrime;
     }
 }

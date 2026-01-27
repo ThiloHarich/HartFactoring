@@ -6,7 +6,7 @@ package de.harich.thilo.factoring;
  * The factor not have to be a prime factor.
  */
 public interface FactorisationAlgorithm {
-    long findSingleFactor(long numberToFactorize);
+    long findSingleFactor(long number);
 
     default String getName(){
         return this.getClass().getSimpleName();

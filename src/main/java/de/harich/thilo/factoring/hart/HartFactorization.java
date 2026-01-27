@@ -120,8 +120,8 @@ public class HartFactorization implements FactorisationAlgorithm {
         }
         return factors;
     }
-    public long findSingleFactor(final long numberToFactorize) {
-        return findSingleFactor(numberToFactorize, false);
+    public long findSingleFactor(final long number) {
+        return findSingleFactor(number, false);
     }
 
     public long findSingleFactor(final long numberToFactorize, boolean stopIfNeeded) {

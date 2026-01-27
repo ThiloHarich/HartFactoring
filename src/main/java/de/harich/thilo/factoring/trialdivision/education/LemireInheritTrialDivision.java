@@ -1,9 +1,4 @@
-package de.harich.thilo.factoring.trialdivision;
-
-import de.harich.thilo.factoring.TrialDivisionAlgorithm;
-import de.harich.thilo.math.SmallPrimes;
-
-import java.util.Arrays;
+package de.harich.thilo.factoring.trialdivision.education;
 
 /**
  * Lemire is around 60% faster than the fastest algorithm based on reciprocal values to determine
@@ -16,30 +11,21 @@ import java.util.Arrays;
  * were we are using double values for multiplying with the reciprocal value to do the division.
  * This might be the main speed advantage.
  */
-public class LemireTrialDivision implements TrialDivisionAlgorithm {
+public class LemireInheritTrialDivision extends PrimeArrayTrialDivision {
 
-    public static int[] primes = {2};
+//    public static int[] primes = {2};
     private static long[] modularInverse;
     private static long[] limitIfDividable;
 
-    public LemireTrialDivision() {
+    public LemireInheritTrialDivision() {
         ensurePrimesExist(0);
         ensureLemireDataExists();
     }
-    public LemireTrialDivision(int maxPrimeFactor) {
+    public LemireInheritTrialDivision(int maxPrimeFactor) {
         ensurePrimesExist(maxPrimeFactor);
         ensureLemireDataExists();
     }
 
-    public static int ensurePrimesExist(int maxPrimeFactor) {
-        int maxStoredPrime = primes[primes.length - 1];
-        if (maxStoredPrime < maxPrimeFactor) {
-            int biggerLimit = 2 * maxPrimeFactor;
-            primes = SmallPrimes.generatePrimes(biggerLimit);
-        }
-        // TODO check if calculating it by maxPrimeFactor / log (maxPrimeFactor) is faster
-        return Math.abs(Arrays.binarySearch(primes, maxPrimeFactor))+1;
-    }
 
     protected void ensureLemireDataExists() {
         if (modularInverse == null || modularInverse.length != primes.length) {
@@ -65,35 +51,6 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
         return inverse;
     }
 
-    @Override
-    public int[] findFactors(long number, int maxPrimeFactor) {
-        int maxPrimeFactorIndex = ensurePrimesExist(maxPrimeFactor);
-        ensureLemireDataExists();
-        return addFactorsFoundIndices(number, maxPrimeFactorIndex);
-    }
-
-    protected int[] addFactorsFoundIndices(long numberToFactorize, int maxPrimeFactorIndex) {
-        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(numberToFactorize);
-        int[] primeFactorIndices = new int[numberBits];
-        int factorIndex = 0;
-        for (int i = 1; i < maxPrimeFactorIndex; i++) {
-            // for hard numbers like big semiprimes finding a factor (early) is unlikely and JIT predicts that
-            // the return branch is unlikely -> always the same data processing; preloading the arrays
-            // you might just copy the lines at the end to enable more lanes e.g. for AVX-512
-            // TODO how to support different AVX ? For SSE-2 4 but not 8 statements are optimal
-            if (factorFound(numberToFactorize, i)) {
-                primeFactorIndices[factorIndex++] = i;
-            }
-        }
-        primeFactorIndices[factorIndex] = -1;
-        return primeFactorIndices;
-    }
-
-    @Override
-    public long findSingleFactor(long number) {
-        return findSingleFactor(number, (int) Math.sqrt(number));
-    }
-
     public int findSingleFactor(long number, int maxPrimeFactor) {
         // Lemire can not handle even numbers
         if (number % 2 == 0) return 2;
@@ -111,11 +68,6 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
             // you might just copy the lines at the end to enable more lanes e.g. for AVX-512
         }
         return -1;
-    }
-
-    @Override
-    public int getFactor(int factorIndex) {
-        return primes[factorIndex];
     }
 
     public boolean factorFound(long number, int primeIndex) {

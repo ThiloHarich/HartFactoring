@@ -34,21 +34,19 @@ public class FactorisationComparisonTest {
         final long lap1 = System.currentTimeMillis();
         System.out.println("time for making Primes : " + (lap1 - start));
 
+        // TODO find out if we can use fma if the call is slower than doing "*" and "+"
         boolean useFusedMultipleAdd = false;
-        List<FactorisationAlgorithm> algorithms = List.of(
+        FactorisationAlgorithm[] algorithms = {
 
 
                 new LemireTrialDivision(),
 //                new FloatReciprocalTrialDivisionAlgorithm(),
-                new ReciprocalTrialDivision(),
-                new PrimeAvoidCastTrialDivision(maxPrime),
-                new PrimeArrayRoundTrialDivision(maxPrime)
+                new ReciprocalArrayTrialDivision(),
+                new PrimeReciprocalTrialDivision(maxPrime),
+                new PrimeArrayTrialDivision(maxPrime)
 //                new ScalarTrialDivisionAlgorithm(),
 //                new VectorizedTrialDivisionAlgorithm(maxPrime)
-
-
-
-        );
+        };
         logTimings(lap1, algorithms, semiprimes);
     }
     /**
@@ -70,7 +68,7 @@ public class FactorisationComparisonTest {
     @Test
     public void comparePerformanceFor41Bit(){
         final int bits = 41	;
-        final int numPrimes = 10000;
+        final int numPrimes = 100000;
 
         boolean readFromFile = true;
         final long start = System.currentTimeMillis();
@@ -79,7 +77,7 @@ public class FactorisationComparisonTest {
         System.out.println("time for making Primes : " + (lap1 - start));
 
         boolean useFusedMultipleAdd = false;
-        List<FactorisationAlgorithm> algorithms = List.of(
+        FactorisationAlgorithm[] algorithms = {
                 new HartFactorization(new MultiplierArraySquareSubtraction(true, 43), new Mod32TableSquareAdjuster()),
                 new HartFactorization(new MultiplierArraySquareSubtraction(false, 43), new Mod32TableSquareAdjuster()),
                 new HartFactorization(new MultiplierArraySquareSubtraction(false, 43), new Mod32SquareAdjuster()),
@@ -94,29 +92,30 @@ public class FactorisationComparisonTest {
                 new HartFactorization(new SquareSubtraction(315), new SquareAdjuster()),
 //                new HartFactorizationAlgorithm(new DifferenceOfSquaresCalculator(1), new FermatMod32Table()),
 
-                new ReciprocalTrialDivision(),
+                new ReciprocalArrayTrialDivision(),
                 new HartFactorization(new SquareSubtraction(1), new SquareAdjuster()),
-                new PrimeAvoidCastTrialDivision()
-        );
+                new PrimeReciprocalTrialDivision()
+        };
         logTimings(lap1, algorithms, numbersToFactorize);
     }
 
-    public static void logTimings(long lap1, List<FactorisationAlgorithm> algorithms, long[] numbersToFactorize) {
+    public static void logTimings(long lap1, FactorisationAlgorithm[] algorithms, long[] numbersToFactorize) {
         final long lap2 = System.currentTimeMillis();
         System.out.println("time for initializing all algorithms : " + (lap2 - lap1));
-        long overallMin = Integer.MAX_VALUE;
-        long minTime = Integer.MAX_VALUE;
+        long overallMin = Long.MAX_VALUE;
+        long minTime = Long.MAX_VALUE;
 
         System.out.println("Name of the algorithm                                                        :\tabsolute time \t relative to best \t relative to algorithm above");
         for (FactorisationAlgorithm algorithm : algorithms){
             long lastTime = minTime;
             minTime = factorize(algorithm, numbersToFactorize, false);
-            if (minTime < overallMin)
-                overallMin = minTime;
-            double relativeTime = minTime / (overallMin - 0.000001);
+            double relativeTime = ((double) minTime) / overallMin;
             double relativeToLast = minTime / (lastTime + 0.0);
             final String name = String.format("%-75s", algorithm.getName());
             System.out.println(name + "  :    \t" +  minTime + " \t " + relativeTime + "\t " + relativeToLast);
+            if (minTime < overallMin) {
+                overallMin = minTime;
+            }
         }
     }
 
@@ -136,7 +135,6 @@ public class FactorisationComparisonTest {
                 new LemireTrialDivision(),
 //                new TrialDivisionAlgorithm(maxPrimeFactor)
                 new ScalarTrialDivision()
-
         );
 
         final long lap2 = System.currentTimeMillis();
