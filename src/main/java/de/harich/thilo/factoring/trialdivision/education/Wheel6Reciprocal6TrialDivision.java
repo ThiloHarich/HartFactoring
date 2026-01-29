@@ -1,6 +1,6 @@
 package de.harich.thilo.factoring.trialdivision.education;
 
-public class WheelReciprocalTrialDivision extends WheelTrialDivision{
+public class Wheel6Reciprocal6TrialDivision extends Wheel6TrialDivision {
 
     // calculating the reciprocal and casting is faster than doing a division,
     // we have to add a value to avoid casting problems but still ~ 26% faster

@@ -4,10 +4,10 @@ package de.harich.thilo.factoring.trialdivision.education;
  * Speedup over ScalarTrialDivision is 300%, which is since we have
  * to consider only 2 the cases 1 and 5 mod 6 (2 out of 6 = 1/3)
  */
-public class WheelTrialDivision extends ScalarTrialDivision {
+public class Wheel6TrialDivision extends ScalarTrialDivision {
 
 
-    public WheelTrialDivision() {
+    public Wheel6TrialDivision() {
     }
 
     @Override

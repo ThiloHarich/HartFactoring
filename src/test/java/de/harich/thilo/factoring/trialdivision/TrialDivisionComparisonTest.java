@@ -10,6 +10,42 @@ import static de.harich.thilo.factoring.FactorisationComparisonTest.logTimings;
 
 public class TrialDivisionComparisonTest {
 
+
+    @Test
+    public void compareTopPerformerFor31Bit(){
+        final int bits = 31	;
+        final int numPrimes = 100000;
+        int maxPrime = (int) (1L << (bits /2));
+
+        boolean readFromFile = true;
+        final long start = System.currentTimeMillis();
+        long[] semiprimes = SmallPrimes.makeSemiPrimesList(bits, numPrimes, readFromFile);
+        final long lap1 = System.currentTimeMillis();
+        System.out.println("time for making Primes : " + (lap1 - start));
+
+        FactorisationAlgorithm[] algorithms = {
+                new Wheel30ArrayTrialDivision(),
+
+                // For 31 bits algorithms are ordered according to the performance, fastest algorithms first
+                new LemireIntTrialDivision(),
+//                new LemireIntInheritTrialDivision(),
+                // not sure why this is slow wehen LemireIntTrialDivision and or ReciprocalArrayTrialDivision test are is activated
+                // It seems like JIT can not support all of them at the same time
+                new LemireTrialDivision(),
+//                new LemireInheritTrialDivision(),
+                new TDiv31Barrett(maxPrime),
+//                new ReciprocalArrayTrialDivision(maxPrime),
+                new FloatReciprocalTrialDivision(maxPrime),
+                new PrimeReciprocalTrialDivision(maxPrime),
+                new Wheel30ArrayTrialDivision(),
+        };
+
+
+        // warmup
+        logTimings(lap1, algorithms, semiprimes);
+        System.out.println(" -------- real results after warmup phase ----------------------");
+        logTimings(lap1, algorithms, semiprimes);
+    }
     /**
      * Run on a Intel(R) Celeron(R) N5100 @ 1.10GHz (1.11 GHz) we see the following timings
      * Name of the algorithm                                                        :	absolute time 	 relative to best 	 relative to algorithm above
@@ -28,31 +64,35 @@ public class TrialDivisionComparisonTest {
     @Test
     public void comparePerformanceFor31Bit(){
         final int bits = 31	;
+        final int numPrimes = 10000;
         int maxPrime = (int) (1L << (bits /2));
-        final int numPrimes = 100000;
-
         boolean readFromFile = true;
         final long start = System.currentTimeMillis();
         long[] semiprimes = SmallPrimes.makeSemiPrimesList(bits, numPrimes, readFromFile);
         final long lap1 = System.currentTimeMillis();
         System.out.println("time for making Primes : " + (lap1 - start));
 
-        boolean useFusedMultipleAdd = false;
         FactorisationAlgorithm[] algorithms = {
 
+                // For 31 bits algorithms are ordered according to the performance, fastest algorithms first
                 new LemireIntTrialDivision(),
                 new LemireIntInheritTrialDivision(),
+                // not sure why this is slow wehen LemireIntTrialDivision and or ReciprocalArrayTrialDivision test are is activated
+                // It seems like JIT can not support all of them at the same time
                 new LemireTrialDivision(),
                 new LemireInheritTrialDivision(),
                 new TDiv31Barrett(maxPrime),
                 new ReciprocalArrayTrialDivision(maxPrime),
-//                new FloatReciprocalTrialDivision(maxPrime),
-//                new PrimeReciprocalTrialDivision(maxPrime),
-//                new PrimeArrayTrialDivision(maxPrime),
-//                new WheelReciprocalTrialDivision(),
-//                new WheelTrialDivision(),
-//                new ScalarReciprocalTrialDivision(),
-//                new ScalarTrialDivision(),
+                new FloatReciprocalTrialDivision(maxPrime),
+                new PrimeReciprocalTrialDivision(maxPrime),
+                new Wheel30ArrayTrialDivision(),
+                new PrimeArrayTrialDivision(maxPrime),
+                new Wheel30TrialDivision(),
+                new Wheel210ArrayTrialDivision(),
+                new Wheel6Reciprocal6TrialDivision(),
+                new Wheel6TrialDivision(),
+                new ScalarReciprocalTrialDivision(),
+                new ScalarTrialDivision(),
         };
 
 
@@ -65,8 +105,8 @@ public class TrialDivisionComparisonTest {
     @Test
     public void comparePerformanceFor41Bit(){
         final int bits = 41	;
-        int maxPrime = (int) (1L << (bits /2));
         final int numPrimes = 10000;
+        int maxPrime = (int) (1L << (bits /2));
 
         boolean readFromFile = true;
         final long start = System.currentTimeMillis();
@@ -74,7 +114,6 @@ public class TrialDivisionComparisonTest {
         final long lap1 = System.currentTimeMillis();
         System.out.println("time for making Primes : " + (lap1 - start));
 
-        boolean useFusedMultipleAdd = false;
         FactorisationAlgorithm[] algorithms = {
 
 //                new LemireIntTrialDivision(),

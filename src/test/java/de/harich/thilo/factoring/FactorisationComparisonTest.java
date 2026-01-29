@@ -157,7 +157,7 @@ public class FactorisationComparisonTest {
     public static long factorize(FactorisationAlgorithm factorizer, long[] numbersToFactorize, boolean print) {
 
 
-        long minTime = Integer.MAX_VALUE;
+        long minTime = Long.MAX_VALUE;
 
         minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, true));
         minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, false));
