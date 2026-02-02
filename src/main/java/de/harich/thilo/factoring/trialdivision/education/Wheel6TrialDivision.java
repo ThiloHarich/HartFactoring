@@ -10,12 +10,9 @@ public class Wheel6TrialDivision extends ScalarTrialDivision {
     public Wheel6TrialDivision() {
     }
 
-    @Override
-    public int[] findFactors(long number, int maxPrimeFactorIndex) {
-        return addFactorsFoundIndices(number, maxPrimeFactorIndex);
-    }
 
-    protected int[] addFactorsFoundIndices(long number, int maxPrimeFactorIndex) {
+    @Override
+    public int[] findFactorIndices(long number, int maxPrimeFactorIndex){
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(maxPrimeFactorIndex);
         int[] primeFactorIndices = new int[numberBits];
         int factorIndex = 0;

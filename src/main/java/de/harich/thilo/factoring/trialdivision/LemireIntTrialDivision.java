@@ -60,6 +60,7 @@ public class LemireIntTrialDivision extends LemireTrialDivision {
             // TODO how to support different AVX ? For SSE-2 4 but not 8 statements are optimal
             if (factorFound (number, i))    return getFactor(i);
             // unrolling 8 times for Lemire int seems to be optimal
+            // this is 2 times the number of unrolling for the 2 times bigger long based LemireTrialDivision
             if (factorFound (number, ++i))  return getFactor(i);
             if (factorFound (number, ++i))  return getFactor(i);
             if (factorFound (number, ++i))  return getFactor(i);

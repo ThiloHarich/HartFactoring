@@ -19,7 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FactorisationComparisonTest {
+public class FactorisationAlgorithmCompareTest {
 
 
     @Test
@@ -160,6 +160,13 @@ public class FactorisationComparisonTest {
         long minTime = Long.MAX_VALUE;
 
         minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, true));
+//        for (int n = 1; n < 32; n+=2) {
+//            for (int i = 0; i < 32; i++) {
+//                String hit = String.format("%4d", ((Wheel120ArrayTrialDivision) factorizer).hits[n][i]);
+//                System.out.print(hit);
+//            }
+//            System.out.println();
+//        }
         minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, false));
         minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, false));
         minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, false));

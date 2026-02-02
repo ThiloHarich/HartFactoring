@@ -24,9 +24,9 @@ public class PrimeArrayTrialDivision extends ScalarTrialDivision {
         ensurePrimesExist(maxPrimeFactor);
     }
     @Override
-    public int[] findFactors(long number, int maxPrimeFactor) {
+    public int[] findFactorIndices(long number, int maxPrimeFactor){
         int maxPrimeFactorIndex = ensurePrimesExist(maxPrimeFactor);
-        return addFactorsFoundIndices(number, maxPrimeFactorIndex);
+        return super.findFactorIndices(number, maxPrimeFactorIndex);
     }
 
     public int findSingleFactor(long number, int maxPrimeFactor) {

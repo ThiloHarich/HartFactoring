@@ -6,7 +6,7 @@ import de.harich.thilo.factoring.trialdivision.jml.TDiv31Barrett;
 import de.harich.thilo.math.SmallPrimes;
 import org.junit.jupiter.api.Test;
 
-import static de.harich.thilo.factoring.FactorisationComparisonTest.logTimings;
+import static de.harich.thilo.factoring.FactorisationAlgorithmCompareTest.logTimings;
 
 public class TrialDivisionComparisonTest {
 
@@ -24,15 +24,14 @@ public class TrialDivisionComparisonTest {
         System.out.println("time for making Primes : " + (lap1 - start));
 
         FactorisationAlgorithm[] algorithms = {
-                new Wheel30ArrayTrialDivision(),
 
                 // For 31 bits algorithms are ordered according to the performance, fastest algorithms first
                 new LemireIntTrialDivision(),
-//                new LemireIntInheritTrialDivision(),
-                // not sure why this is slow wehen LemireIntTrialDivision and or ReciprocalArrayTrialDivision test are is activated
+                new LemireIntInheritTrialDivision(),
+                // not sure why this is (sometimes) slow by a factor of 5 wehen LemireIntTrialDivision and or ReciprocalArrayTrialDivision test are is activated
                 // It seems like JIT can not support all of them at the same time
                 new LemireTrialDivision(),
-//                new LemireInheritTrialDivision(),
+                new LemireInheritTrialDivision(),
                 new TDiv31Barrett(maxPrime),
 //                new ReciprocalArrayTrialDivision(maxPrime),
                 new FloatReciprocalTrialDivision(maxPrime),
@@ -88,7 +87,6 @@ public class TrialDivisionComparisonTest {
                 new Wheel30ArrayTrialDivision(),
                 new PrimeArrayTrialDivision(maxPrime),
                 new Wheel30TrialDivision(),
-                new Wheel210ArrayTrialDivision(),
                 new Wheel6Reciprocal6TrialDivision(),
                 new Wheel6TrialDivision(),
                 new ScalarReciprocalTrialDivision(),

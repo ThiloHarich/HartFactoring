@@ -10,7 +10,7 @@ public class ScalarTrialDivision implements TrialDivisionAlgorithm {
     public ScalarTrialDivision() {
     }
     @Override
-    public int[] findFactors(long number, int maxPrimeFactorIndex) {
+    public int [] findFactorIndices(long number, int maxPrimeFactorIndex) {
         return addFactorsFoundIndices(number, maxPrimeFactorIndex);
     }
 

@@ -1,16 +1,11 @@
 package de.harich.thilo.factoring.hart;
 
 import de.harich.thilo.factoring.FactorisationAlgorithm;
-import de.harich.thilo.factoring.Factor;
 import de.harich.thilo.factoring.hart.calculator.Mod32TableSquareAdjuster;
 import de.harich.thilo.factoring.hart.calculator.MultiplierArraySquareSubtraction;
 import de.harich.thilo.factoring.hart.calculator.educational.SquareAdjuster;
 import de.harich.thilo.factoring.hart.calculator.educational.SquareSubtraction;
-import de.harich.thilo.factoring.trialdivision.LemireTrialDivision;
 import de.harich.thilo.math.BinaryGreatestCommonDivisorEngine;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A clean code Approach for a Hart Factoring algorithm running in O(n^1/3).
@@ -67,7 +62,6 @@ public class HartFactorization implements FactorisationAlgorithm {
 
     static int limitMightHelpFactorisation = 1 << 21;
 
-    LemireTrialDivision trialDivisionAlgorithm = new LemireTrialDivision();
     BinaryGreatestCommonDivisorEngine greatestCommonDivisorEngine = new BinaryGreatestCommonDivisorEngine();
 
     // use decomposition not Inheritance,
@@ -104,21 +98,23 @@ public class HartFactorization implements FactorisationAlgorithm {
     }
 
     /**
-     * This is the main method for calculating a prime factorisation.
-     * The implementation has to return a list of factors such that the absolut value of the elements in the list multiplied together
-     * must be the numberToFactorize.
+     * TODO at the moment you can only use it if no primes below n^1/3 exist -> only 2 factors exist.
+     * Both are >= n^1/3 -> both mut be prime
      */
-    public List<Factor> findFactors(long numberToFactorize) {
-        List<Factor> factors = new ArrayList<>();
-        long primeFactor1 = findSingleFactor(numberToFactorize, true);
-        if (primeFactor1 > 1){
-            factors.add(new Factor(primeFactor1));
+    public void addPrimeFactorsAboveCubicRoot(long numberToFactorize, long[] bigPrimeFactorList) {
+        int index = 0;
+        long primeFactor0 = findSingleFactor(numberToFactorize, true);
+        if (primeFactor0 > 1){
+            bigPrimeFactorList[index++] = primeFactor0;
         }
-        long primeFactor2 = numberToFactorize / Math.abs(primeFactor1);
-        if (primeFactor2 != 1){
-            factors.add(new Factor(primeFactor2));
+        long primeFactor1 = numberToFactorize / Math.abs(primeFactor0);
+        if (primeFactor1 != 1){
+            bigPrimeFactorList[index] = primeFactor1;
         }
-        return factors;
+        if (primeFactor1 > 0 && primeFactor1 < primeFactor0){
+            bigPrimeFactorList[0] = primeFactor1;
+            bigPrimeFactorList[1] = primeFactor0;
+        }
     }
     public long findSingleFactor(final long number) {
         return findSingleFactor(number, false);

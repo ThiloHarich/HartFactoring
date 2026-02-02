@@ -25,7 +25,7 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
     }
 
     @Override
-    public int[] findFactors(long number, int maxPrimeFactorIndex) {
+    public int [] findFactorIndices(long number, int maxPrimeFactorIndex) {
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(maxPrimeFactorIndex);
         int[] primeFactorIndices = new int[numberBits];
         int factorIndex = 0;
@@ -52,6 +52,7 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
         primeFactorIndices[factorIndex] = -1;
         return primeFactorIndices;
     }
+
     @Override
     public long findSingleFactor(long number) {
         return findSingleFactor(number, (int) Math.sqrt(number));

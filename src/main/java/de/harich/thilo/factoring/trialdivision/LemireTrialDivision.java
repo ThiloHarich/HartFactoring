@@ -5,6 +5,8 @@ import de.harich.thilo.math.SmallPrimes;
 
 import java.util.Arrays;
 
+import static de.harich.thilo.factoring.Factorization.addFactor2;
+
 /**
  * Lemire is around 60% faster than the fastest algorithm based on reciprocal values to determine
  * the dividability of a number (which is ReciprocalArrayTrialDivision)
@@ -33,12 +35,12 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
 
     public static int ensurePrimesExist(int maxPrimeFactor) {
         int maxStoredPrime = primes[primes.length - 1];
-        if (maxStoredPrime < maxPrimeFactor) {
+        if (maxStoredPrime <= maxPrimeFactor) {
             int biggerLimit = 2 * maxPrimeFactor;
             primes = SmallPrimes.generatePrimes(biggerLimit);
         }
         // TODO check if calculating it by maxPrimeFactor / log (maxPrimeFactor) is faster
-        return Math.abs(Arrays.binarySearch(primes, maxPrimeFactor))+1;
+        return Math.abs(Arrays.binarySearch(primes, maxPrimeFactor));
     }
 
     protected void ensureLemireDataExists() {
@@ -66,14 +68,52 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
     }
 
     @Override
-    public int[] findFactors(long number, int maxPrimeFactor) {
+    public int[] findFactorIndices(long number, int maxPrimeFactor) {
         int maxPrimeFactorIndex = ensurePrimesExist(maxPrimeFactor);
         ensureLemireDataExists();
-        return addFactorsFoundIndices(number, maxPrimeFactorIndex);
+            return addFactorsFoundIndices(number, maxPrimeFactorIndex);
     }
 
-    protected int[] addFactorsFoundIndices(long numberToFactorize, int maxPrimeFactorIndex) {
-        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(numberToFactorize);
+    public long[] findAllFactors(long number, int maxPrimeFactor) {
+        int maxPrimeFactorIndex = ensurePrimesExist(maxPrimeFactor);
+        ensureLemireDataExists();
+        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
+        long[] primeFactors = new long[numberBits];
+        int trailingZeros = Long.numberOfTrailingZeros(number);
+        number = number >> trailingZeros;
+        int factorIndex = addFactor2(primeFactors, trailingZeros);
+        // if is a power of 2 we can exit directly
+        if (number == 1) {
+            markAsFactorized(primeFactors);
+            return primeFactors;
+        }
+        for (int i = 1; i < maxPrimeFactorIndex; i++) {
+            // is this loop to??? complex
+            if (factorFound(number, i)) {
+                int primeFactor = getFactor(i);
+                do {
+                    primeFactors[factorIndex++] = primeFactor;
+                    // TODO we might speed this up by using reciprocals
+                    number = number / primeFactor;
+                } while ((factorFound (number, i)));
+                if (number == 1) {
+                    // this indicates that number is factorized
+                    markAsFactorized(primeFactors);
+                    return primeFactors;
+                }
+            }
+        }
+        // store the remaining number as last factor, abd mark it
+        primeFactors[factorIndex] = -number;
+        return primeFactors;
+    }
+
+    private static void markAsFactorized(long[] primeFactors) {
+        primeFactors[0] = - primeFactors[0];
+    }
+
+    protected int[] addFactorsFoundIndices(long number, int maxPrimeFactorIndex) {
+        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
         int[] primeFactorIndices = new int[numberBits];
         int factorIndex = 0;
         for (int i = 1; i < maxPrimeFactorIndex; i++) {
@@ -81,9 +121,7 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
             // the return branch is unlikely -> always the same data processing; preloading the arrays
             // you might just copy the lines at the end to enable more lanes e.g. for AVX-512
             // TODO how to support different AVX ? For SSE-2 4 but not 8 statements are optimal
-            if (factorFound(numberToFactorize, i)) {
-                primeFactorIndices[factorIndex++] = i;
-            }
+            if (factorFound(number, i)) {primeFactorIndices[factorIndex++] = i;}
         }
         primeFactorIndices[factorIndex] = -1;
         return primeFactorIndices;
