@@ -1,4 +1,4 @@
-In this project we provide fast java factoring algorithms for intergers up to 63 bits.
+In this project we provide fast java factoring algorithms for integers up to 63 bits.
 The main goal for this are 
 
 - Clean Code

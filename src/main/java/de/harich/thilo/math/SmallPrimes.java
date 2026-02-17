@@ -1,15 +1,33 @@
 package de.harich.thilo.math;
 
 
+import de.harich.thilo.factoring.algorithm.trialdivision.LemireTrialDivision;
+
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
+import static de.harich.thilo.factoring.algorithm.FactorisationAlgorithm.NO_FACTOR_FOUND;
+
+// TODO add some more method for finding a prime of type long
+// prime for number of Bits or a number using a wheel + some of the existing methods.
 public class SmallPrimes {
+
+    // for up to 26 bit we expect 100 kB memory
+    private static final int GENERATE_ALL_LIMIT = (int) (1L << 24);
+
+    // BitSet, HashSet and int[] should hve the same amount of memory !?
+    private static BitSet primesSet;
+
+    private final static Random rnd = new Random();
+
+    private final static LemireTrialDivision lemireTrialDivision = new LemireTrialDivision();
 
     public static int[] generatePrimes(int limit) {
         boolean[] isComposite = getIsComposite(limit);
@@ -50,12 +68,12 @@ public class SmallPrimes {
         boolean[] isComposite = getIsComposite(limit);
 
         // Array mit Primzahlen füllen
-        BitSet primes = new BitSet();
+        primesSet = new BitSet();
         for (int i = 2; i <= limit; i++) {
-            if (!isComposite[i]) primes.set(i);
+            if (!isComposite[i]) primesSet.set(i);
         }
 
-        return primes;
+        return primesSet;
     }
 
     /**
@@ -67,7 +85,7 @@ public class SmallPrimes {
      * This might ensure the numbers are hard to factorize but do not have some kind of structure.
      *
      */
-    public static long[] makeSemiPrimesList(int bits, int numPrimes, boolean readFromFile) {
+    public static long[] makeSemiPrimesList(int bits, int numPrimes, boolean readFromFile, double lowerSemiprimeExponent) {
         long[] semiPrimes = new long[numPrimes];
         final String file = "semiPrimes_" + (numPrimes / 1000) + "K_" + bits + "Bits.dat";
         final Path path = Paths.get(file);
@@ -89,7 +107,7 @@ public class SmallPrimes {
         Random rnd = new Random();
         for (int i=0; i < numPrimes; )
         {
-            final int smallFactorBitsMin = (int) Math.ceil(bits * .37);
+            final int smallFactorBitsMin = (int) Math.ceil(bits * lowerSemiprimeExponent);
 //			final int smallFactorBitsMin = (int) (bits * .5);
             final int smallFactorBitsMax = (int) (bits * .5);
 //			final int smallFactorBitsMax = 20;
@@ -135,5 +153,62 @@ public class SmallPrimes {
         System.out.println("wrote " + semiPrimes.length + " semi primes. Took " + (endWrite - endCreation)/ 1000.0 + " sec to write numbers.");
 
         return semiPrimes;
+    }
+
+    public static int[] generatePrimes(int targetPrime, int numPrimes) {
+        if (targetPrime < GENERATE_ALL_LIMIT){
+            return generateSmallPrimes(targetPrime, numPrimes);
+        }
+        else{
+            return generateBigPrimes(targetPrime, numPrimes);
+        }
+    }
+
+    private static int[] generateBigPrimes(int targetPrime, int range) {
+        Set<Integer> primes = new HashSet<>();
+
+        while (primes.size() < range) {
+            addBigPrime(targetPrime, getPrimeRange(range), primes);
+        }
+        return primes.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+    private static int getPrimeRange(int range) {
+        int bitsOfRange = Long.SIZE - Long.numberOfLeadingZeros(range);
+        return 2 * (bitsOfRange * range);
+    }
+
+    private static void addBigPrime(int targetPrime, int primeRange, Set<Integer> primes) {
+        int numberToCheck = getNumberToCheck(targetPrime, primeRange);
+        if (lemireTrialDivision.findSingleFactor(numberToCheck) == NO_FACTOR_FOUND){
+            primes.add(numberToCheck);
+        }
+    }
+
+    private static int[] generateSmallPrimes(int targetPrime, int numPrimes) {
+        ensurePrimesSetExist();
+        Set<Integer> primes = new HashSet<>();
+
+        while (primes.size() < numPrimes) {
+            addSmallPrime (targetPrime, getPrimeRange(numPrimes), primes);
+        }
+        return primes.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+    private static void addSmallPrime(int targetPrime, int primeRange, Set<Integer> primes) {
+        int numberToCheck = getNumberToCheck(targetPrime, primeRange);
+        int prime = primesSet.nextSetBit(numberToCheck);
+        primes.add(prime);
+    }
+
+    private static int getNumberToCheck(int targetPrime, int primeRange) {
+        int origin = targetPrime - primeRange;
+        return rnd.nextInt(Math.max(origin, 0), targetPrime + primeRange);
+    }
+
+    private static void ensurePrimesSetExist() {
+        if (primesSet == null || primesSet.length() + 10 < GENERATE_ALL_LIMIT){
+            generatePrimesSet(GENERATE_ALL_LIMIT);
+        }
     }
 }
