@@ -4,9 +4,12 @@ WORKDIR /app
 
 # Kopiere Gradle Wrapper und Build-Dateien
 COPY gradlew .
-COPY gradle gradle
+COPY gradle ./gradle
 COPY build.gradle .
 COPY settings.gradle .
+
+# Sicherstellen, dass gradlew ausführbar ist
+RUN chmod +x gradlew
 
 # Kopiere Source Code
 COPY src src
