@@ -11,7 +11,7 @@ public class Wheel30TrialDivision extends ScalarTrialDivision {
     }
 
     @Override
-    public int[] findFactorIndices(long number, int maxPrimeFactorIndex){
+    public int[] findPrimefactorIndices(long number, int maxPrimeFactorIndex){
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(maxPrimeFactorIndex);
         int[] primeFactorIndices = new int[numberBits];
         int factorIndex = 0;
@@ -25,21 +25,21 @@ public class Wheel30TrialDivision extends ScalarTrialDivision {
         // Die Abstände (Increments) zwischen den 8 Kandidaten sind:
         // 4, 2, 4, 2, 4, 6, 2, 6 (Summe = 30)
         for (int factor = 7; factor <= maxPrimeFactorIndex; ) {
-            if (factorFound(number, factor)) primeFactorIndices[factorIndex++] = factor; // 7
+            if (hasPrimeFactor(number, factor)) primeFactorIndices[factorIndex++] = factor; // 7
             factor += 4;
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) primeFactorIndices[factorIndex++] = factor; // 11
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactorIndices[factorIndex++] = factor; // 11
             factor += 2;
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) primeFactorIndices[factorIndex++] = factor; // 13
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactorIndices[factorIndex++] = factor; // 13
             factor += 4;
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) primeFactorIndices[factorIndex++] = factor; // 17
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactorIndices[factorIndex++] = factor; // 17
             factor += 2;
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) primeFactorIndices[factorIndex++] = factor; // 19
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactorIndices[factorIndex++] = factor; // 19
             factor += 4;
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) primeFactorIndices[factorIndex++] = factor; // 23
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactorIndices[factorIndex++] = factor; // 23
             factor += 6;
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) primeFactorIndices[factorIndex++] = factor; // 29
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactorIndices[factorIndex++] = factor; // 29
             factor += 2;
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) primeFactorIndices[factorIndex++] = factor; // 31 (Start nächster Block)
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactorIndices[factorIndex++] = factor; // 31 (Start nächster Block)
             factor += 6;
         }
 
@@ -54,21 +54,21 @@ public class Wheel30TrialDivision extends ScalarTrialDivision {
         if (number % 5 == 0) return 5;
 
         for (int factor = 7; factor <= maxPrimeFactorIndex; ) {
-            if (factorFound(number, factor)) return factor;
+            if (hasPrimeFactor(number, factor)) return factor;
             factor += 4; // 11
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) return factor;
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
             factor += 2; // 13
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) return factor;
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
             factor += 4; // 17
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) return factor;
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
             factor += 2; // 19
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) return factor;
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
             factor += 4; // 23
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) return factor;
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
             factor += 6; // 29
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) return factor;
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
             factor += 2; // 31
-            if (factor <= maxPrimeFactorIndex && factorFound(number, factor)) return factor;
+            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
             factor += 6; // Nächster Zyklus
         }
         return -1;

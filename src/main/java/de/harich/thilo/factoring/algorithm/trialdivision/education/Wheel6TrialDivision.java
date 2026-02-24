@@ -12,7 +12,7 @@ public class Wheel6TrialDivision extends ScalarTrialDivision {
 
 
     @Override
-    public int[] findFactorIndices(long number, int maxPrimeFactorIndex){
+    public int[] findPrimefactorIndices(long number, int maxPrimeFactorIndex){
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(maxPrimeFactorIndex);
         int[] primeFactorIndices = new int[numberBits];
         int factorIndex = 0;
@@ -21,8 +21,8 @@ public class Wheel6TrialDivision extends ScalarTrialDivision {
         if (number % 3 == 0) primeFactorIndices[factorIndex++] =  3;
 
         for (int factor = 5; factor <= maxPrimeFactorIndex; factor += 6) {
-            if (factorFound (number, factor)) primeFactorIndices[factorIndex++] = factor;
-            if (factorFound (number, factor + 2)) primeFactorIndices[factorIndex++] = factor + 2;
+            if (hasPrimeFactor(number, factor)) primeFactorIndices[factorIndex++] = factor;
+            if (hasPrimeFactor(number, factor + 2)) primeFactorIndices[factorIndex++] = factor + 2;
         }
         primeFactorIndices[factorIndex] = -1;
         return primeFactorIndices;
@@ -34,8 +34,8 @@ public class Wheel6TrialDivision extends ScalarTrialDivision {
         if (number % 3 == 0) return 3;
 
         for (int factor = 5; factor <= maxPrimeFactorIndex; factor += 6) {
-            if (factorFound (number, factor)) return factor;
-            if (factorFound (number, factor + 2)) return factor + 2;
+            if (hasPrimeFactor(number, factor)) return factor;
+            if (hasPrimeFactor(number, factor + 2)) return factor + 2;
         }
         return -1;
     }

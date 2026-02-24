@@ -10,7 +10,7 @@ public class ScalarTrialDivision implements TrialDivisionAlgorithm {
     public ScalarTrialDivision() {
     }
     @Override
-    public int [] findFactorIndices(long number, int maxPrimeFactorIndex) {
+    public int [] findPrimefactorIndices(long number, int maxPrimeFactorIndex) {
         return addFactorsFoundIndices(number, maxPrimeFactorIndex);
     }
 
@@ -23,7 +23,7 @@ public class ScalarTrialDivision implements TrialDivisionAlgorithm {
             // the return branch is unlikely -> always the same data processing; preloading the arrays
             // you might just copy the lines at the end to enable more lanes e.g. for AVX-512
             // TODO how to support different AVX ? For SSE-2 4 but not 8 statements are optimal
-            if (factorFound(numberToFactorize, i)) {
+            if (hasPrimeFactor(numberToFactorize, i)) {
                 primeFactorIndices[factorIndex++] = i;
             }
         }
@@ -33,18 +33,18 @@ public class ScalarTrialDivision implements TrialDivisionAlgorithm {
 
     public int findSingleFactor(long number, int maxPrimeFactor) {
         for (int factorIndex = 2; factorIndex <= maxPrimeFactor; factorIndex++) {
-            if (factorFound (number, factorIndex)) return getFactor(factorIndex);
+            if (hasPrimeFactor(number, factorIndex)) return getPrimeFactor(factorIndex);
 //            if (factorFound (number, ++factorIndex)) return getFactor(factorIndex);
         }
         return -1;
     }
 
-    public boolean factorFound(long number, int factorIndex){
-        return numberDivFactor(number, factorIndex) * getFactor(factorIndex) == number;
+    public boolean hasPrimeFactor(long number, int primeIndex){
+        return numberDivFactor(number, primeIndex) * getPrimeFactor(primeIndex) == number;
     }
 
     long numberDivFactor(long number, int factorIndex){
-        return number / getFactor(factorIndex);
+        return number / getPrimeFactor(factorIndex);
     }
 
     @Override

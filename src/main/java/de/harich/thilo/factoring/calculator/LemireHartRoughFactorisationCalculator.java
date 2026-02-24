@@ -38,7 +38,7 @@ public class LemireHartRoughFactorisationCalculator extends LemireHartSmoothFact
     public long[] getSortedPrimeFactors(long number) {
         int maxPrimeFactor = (int) Math.cbrt(number);
         // TODO check for existing factorisation!?
-        int[] factorIndices = smallFactorsAlgorithm.findFactorIndices(number, maxPrimeFactor);
+        int[] factorIndices = smallFactorsAlgorithm.findPrimefactorIndices(number, maxPrimeFactor);
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
         long[] sortedPrimeFactors = new long[numberBits + 2];
         long[] numberAndIndex = addSmallFactors(number, factorIndices, sortedPrimeFactors, smallFactorsAlgorithm, maxPrimeFactor);

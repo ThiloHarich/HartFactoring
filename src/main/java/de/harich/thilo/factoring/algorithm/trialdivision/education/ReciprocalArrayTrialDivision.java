@@ -40,12 +40,12 @@ public class ReciprocalArrayTrialDivision extends PrimeReciprocalTrialDivision {
 //        final int i1 = (maxPrimeFactorIndex + 16) & ~15;
 //        for (int i = 0; i < i1; i++) {
         for (int primeIndex = 0; primeIndex < maxPrimeFactorIndex; primeIndex++) {
-            if (factorFound (number, primeIndex))    return getFactor(primeIndex);
+            if (hasPrimeFactor(number, primeIndex))    return getPrimeFactor(primeIndex);
             // here unrolling helps
             // TODO how to support different AVX ? For SSE-2 4 or 8 statements are optimal
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
 //            if (factorFound (numberToFactorize, ++primeIndex))  return getFactor(primeIndex);
 //            if (factorFound (numberToFactorize, ++primeIndex))  return getFactor(primeIndex);
 //            if (factorFound (numberToFactorize, ++primeIndex))  return getFactor(primeIndex);
@@ -57,12 +57,12 @@ public class ReciprocalArrayTrialDivision extends PrimeReciprocalTrialDivision {
     }
 
     @Override
-    public int[] findFactorIndices(long number, int maxPrimeFactor){
+    public int[] findPrimefactorIndices(long number, int maxPrimeFactor){
         // will also be called in the super method
         ensurePrimesExist(maxPrimeFactor);
         // this line is new
         ensureReciprocalsExist();
-        return super.findFactorIndices(number, maxPrimeFactor);
+        return super.findPrimefactorIndices(number, maxPrimeFactor);
     }
 }
 

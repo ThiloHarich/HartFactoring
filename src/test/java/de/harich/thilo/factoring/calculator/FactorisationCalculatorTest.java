@@ -1,15 +1,13 @@
 package de.harich.thilo.factoring.calculator;
 
 import de.harich.thilo.factoring.FactorisationRunner;
+import de.harich.thilo.factoring.TestData;
 import de.harich.thilo.factoring.algorithm.trialdivision.LemireTrialDivision;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.DoubleStream;
-import java.util.stream.LongStream;
 
-import static de.harich.thilo.factoring.TestData.makeSemiprimeList;
 import static java.lang.Math.pow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,11 +34,12 @@ public class FactorisationCalculatorTest {
 
 
     @Test
-    public void comparePerformance(){
+    public void comparePerformanceOnSemiprimes(){
         // TODO  cross over should be at prime (n^1/3) ~ n^(1/3) * log(n^1/3)
         // ~ n^(1/3) * const * numberBits(n^1/3)
         FactorisationCalculator[] calculators = {
 //                new FactorisationCalculatorLemireInt(),
+                new LemireCollectFactorisationCalculator(),
                 new LemireFactorisationCalculator(),
                 new HartFactorisationCalculator(),
                 new LemireHartSmoothFactorisationCalculator(new LemireTrialDivision()),
@@ -55,17 +54,10 @@ public class FactorisationCalculatorTest {
             final long start = System.nanoTime();
 //        long[] numbersToFactorize = SmallPrimes.makeSemiPrimesList(bits, numPrimes, readFromFile, .25);
             //
-            double smallerExponent = 0.3;
-            final int numPrimes = (int) pow(2.0, bits * smallerExponent) / bits;
-            double biggerExponent = .5;
-            double stepExponent = .024999;
-            int finalBits = bits;
-            List<Long> numbersToFactorize = DoubleStream
-                    .iterate(smallerExponent, e -> e < biggerExponent, e -> e + stepExponent)
-                    .mapToObj(e -> makeSemiprimeList(finalBits, numPrimes, e)) // Erzeugt Stream<long[]>
-                    .flatMapToLong(LongStream::of)                                         // Macht daraus einen einzigen LongStream
-                    .boxed()
-                    .toList();
+//            List<Long> numbersToFactorize = TestData.makeSemiprimeList(bits);
+            double smallExponent = .2;
+            final int numPrimes = (int) pow(2.0, bits * smallExponent) / bits;
+            long[] numbersToFactorize = TestData.makePrimesOfSameSizeList(bits, numPrimes, smallExponent);
             long lap1 = System.nanoTime();
             System.out.println("time for making Primes : " + (lap1 - start));
             System.out.println("Name of the factorization                                                        :\tabsolute time \t relative to best ");
@@ -74,13 +66,14 @@ public class FactorisationCalculatorTest {
             for (FactorisationCalculator calculator : calculators) {
 
                 // two times warmup
-                doFactorisation(calculator, numbersToFactorize);
-                doFactorisation(calculator, numbersToFactorize);
+                doFactorisation(calculator, numbersToFactorize, true);
+                doFactorisation(calculator, numbersToFactorize, true);
                 lap1 = System.nanoTime();
                 // now do the real job, and measure performance
-                int loop = 100000 / numbersToFactorize.size();
+                int loop = 100000 / numbersToFactorize.length;
+//                int loop = 100000 / numbersToFactorize.size();
                 for (int i = 0; i < loop; i++) {
-                    doFactorisation(calculator, numbersToFactorize);
+                    doFactorisation(calculator, numbersToFactorize, false);
                 }
 
                 final long lap2 = System.nanoTime();
@@ -94,6 +87,18 @@ public class FactorisationCalculatorTest {
         }
     }
 
+    private static void doFactorisation(FactorisationCalculator calculator, long[] numbersToFactorize, boolean verifyResult) {
+        for (long number : numbersToFactorize) {
+            long[] primeFactors = calculator.getSortedPrimeFactors(number);
+            long product = 1;
+            if (verifyResult) {
+                for (int i = 0; i < primeFactors.length && primeFactors[i] != -1; i++) {
+                    product *= primeFactors[i];
+                }
+                assertEquals(number, product);
+            }
+        }
+    }
     private static void doFactorisation(FactorisationCalculator calculator, List<Long> numbersToFactorize) {
         for (long number : numbersToFactorize) {
             calculator.getSortedPrimeFactors(number);

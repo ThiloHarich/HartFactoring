@@ -11,7 +11,7 @@ public interface TrialDivisionAlgorithm extends FactorisationAlgorithm {
      * than once.
      * Should be used, when the number might have a prime factor bigger than getFactor(maxPrimeFactorIndex)
      */
-    int[] findFactorIndices(long number, int maxPrimeFactorIndex);
+    int[] findPrimefactorIndices(long number, int maxPrimeFactorIndex);
 
 //    /**
 //     * finds all prime factors dividing the number.
@@ -20,9 +20,9 @@ public interface TrialDivisionAlgorithm extends FactorisationAlgorithm {
 //     */
 //    long[] findAllFactors(long number, int maxPrimeFactorIndex);
 
-    boolean factorFound(long number, int factorIndex);
+    boolean hasPrimeFactor(long number, int primeIndex);
 
-    default int getFactor(int factorIndex){
-        return factorIndex;
+    default int getPrimeFactor(int primeFactorIndex){
+        return primeFactorIndex;
     }
 }

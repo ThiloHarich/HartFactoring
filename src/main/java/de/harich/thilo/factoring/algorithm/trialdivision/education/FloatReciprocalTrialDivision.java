@@ -37,7 +37,7 @@ public class FloatReciprocalTrialDivision extends ReciprocalArrayTrialDivision {
     }
 
     boolean factorFound(int number, int factorIndex){
-        return numberDivFactor(number, factorIndex) * getFactor(factorIndex) == number;
+        return numberDivFactor(number, factorIndex) * getPrimeFactor(factorIndex) == number;
     }
 
     public int findSingleFactor(long number, int maxPrimeFactor) {
@@ -46,23 +46,23 @@ public class FloatReciprocalTrialDivision extends ReciprocalArrayTrialDivision {
         ensureReciprocalsExist();
         for (int primeIndex = 0; primeIndex < maxPrimeFactorIndex; primeIndex++) {
 
-            if (factorFound (numberInt, primeIndex))    return getFactor(primeIndex);
+            if (factorFound (numberInt, primeIndex))    return getPrimeFactor(primeIndex);
             // you might just copy the lines at the end to enable more lanes e.g. for AVX-512
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
 
         }
         return -1;

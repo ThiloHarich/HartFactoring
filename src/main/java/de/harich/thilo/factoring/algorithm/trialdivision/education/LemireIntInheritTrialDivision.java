@@ -51,20 +51,20 @@ public class LemireIntInheritTrialDivision extends LemireInheritTrialDivision {
             // the return branch is unlikely -> always the same data processing; preloading the arrays
             // you might just copy the lines at the end to enable more lanes e.g. for AVX-512
             // TODO how to support different AVX ? For SSE-2 4 but not 8 statements are optimal
-            if (factorFound (number, i))    return getFactor(i);
+            if (hasPrimeFactor(number, i))    return getPrimeFactor(i);
             // unrolling 8 times for Lemire int seems to be optimal
-            if (factorFound (number, ++i))  return getFactor(i);
-            if (factorFound (number, ++i))  return getFactor(i);
-            if (factorFound (number, ++i))  return getFactor(i);
-            if (factorFound (number, ++i))  return getFactor(i);
-            if (factorFound (number, ++i))  return getFactor(i);
-            if (factorFound (number, ++i))  return getFactor(i);
-            if (factorFound (number, ++i))  return getFactor(i);
+            if (hasPrimeFactor(number, ++i))  return getPrimeFactor(i);
+            if (hasPrimeFactor(number, ++i))  return getPrimeFactor(i);
+            if (hasPrimeFactor(number, ++i))  return getPrimeFactor(i);
+            if (hasPrimeFactor(number, ++i))  return getPrimeFactor(i);
+            if (hasPrimeFactor(number, ++i))  return getPrimeFactor(i);
+            if (hasPrimeFactor(number, ++i))  return getPrimeFactor(i);
+            if (hasPrimeFactor(number, ++i))  return getPrimeFactor(i);
         }
         return -1;
     }
 
-    public boolean factorFound(long number, int primeIndex) {
+    public boolean hasPrimeFactor(long number, int primeIndex) {
         int numberInt = (int) number;
         // multiply number and primeModularInverted (overflow can happen!)
         int product = numberInt * modularInverseInt[primeIndex];

@@ -1,11 +1,12 @@
 plugins {
     id 'java'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'de.harich.thilo'
 version = '1.0-SNAPSHOT'
 
-// Nutze Java 21 für die besten AVX-512 Features
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(24)
@@ -17,13 +18,12 @@ repositories {
 }
 
 dependencies {
-    // Das eigentliche JUnit 5 API
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-    // Die Engine, die die Tests ausführt
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-    // Falls du auch Parameterized Tests oder ähnliches nutzt:
-//    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
 }
 
 // Ermöglicht die Nutzung der Vector-API für AVX-512

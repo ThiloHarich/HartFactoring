@@ -8,7 +8,7 @@ public class FactorisationCalculatorLemireInt implements FactorisationCalculator
 
     @Override
     public long[] getSortedPrimeFactors(long number) {
-        return factorisationAlgorithm.findAllFactors(number, (int) Math.sqrt(number));
+        return factorisationAlgorithm.findAllPrimeFactors(number, (int) Math.sqrt(number));
     }
 
 //    @Override

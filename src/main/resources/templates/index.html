@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hart Factoring</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 50px; background-color: #f8f9fa; }
+        .container { max-width: 800px; }
+        .card { margin-bottom: 20px; }
+        .result-table { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Hart Factoring</h1>
+        
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form action="/factorize" th:action="@{/factorize}" method="post">
+                    <div class="mb-3">
+                        <label for="numbers" class="form-label">Zahlen zum Faktorisieren (kommagetrennt):</label>
+                        <input type="text" class="form-control" id="numbers" name="numbers" 
+                               th:value="${input}" placeholder="z.B. 1234, 5678, 9999" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Faktorisieren</button>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${results}" class="card shadow-sm">
+            <div class="card-header bg-success text-white">Ergebnisse</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Eingabe</th>
+                            <th>Faktoren (Exponenten)</th>
+                            <th>CSV</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="res : ${results}">
+                            <td th:text="${res.input}"></td>
+                            <td th:text="${res.output}"></td>
+                            <td th:text="${res.csv}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <p class="text-muted">REST API: <code>/api/factorize?numbers=123,456</code></p>
+        </div>
+    </div>
+</body>
+</html>

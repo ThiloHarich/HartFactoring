@@ -40,7 +40,7 @@ public class LemireHartSmoothFactorisationCalculator implements FactorisationCal
     public long[] getSortedPrimeFactors(long number) {
         // TODO check for existing factorisation!?
         int maxPrimeFactor = (int) Math.cbrt(number);
-        long[] primeFactors = smallFactorsAlgorithm.findAllFactors(number, maxPrimeFactor);
+        long[] primeFactors = smallFactorsAlgorithm.findAllPrimeFactors(number, maxPrimeFactor);
         boolean isNumberFactorized = primeFactors[0] < 0 && - primeFactors[0] != number;
         if (isNumberFactorized){
             primeFactors[0] = - primeFactors[0];
@@ -73,12 +73,12 @@ public class LemireHartSmoothFactorisationCalculator implements FactorisationCal
                 break;
             }
             do {
-                long primeFactor = smallFactorsAlgorithm.getFactor(factorIndex);
+                long primeFactor = smallFactorsAlgorithm.getPrimeFactor(factorIndex);
                 smallPrimeFactorList[index++] = primeFactor;
                 // TODO we might speed this up by using reciprocals
                 number = number / primeFactor;
                 // factorFound is fast for Lemire trial division
-            } while ((smallFactorsAlgorithm.factorFound (number, factorIndex)));
+            } while ((smallFactorsAlgorithm.hasPrimeFactor(number, factorIndex)));
         }
         return new long [] {number, index};
     }

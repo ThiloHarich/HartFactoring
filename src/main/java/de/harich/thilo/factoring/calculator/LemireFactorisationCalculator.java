@@ -8,7 +8,7 @@ public class LemireFactorisationCalculator implements FactorisationCalculator {
 
     @Override
     public long[] getSortedPrimeFactors(long number) {
-        long[] factorsBelowSqrt = factorisationAlgorithm.findAllFactors(number, (int) Math.sqrt(number));
+        long[] factorsBelowSqrt = factorisationAlgorithm.findAllPrimeFactors(number, (int) Math.sqrt(number));
         return factorsBelowSqrt;
 
     }

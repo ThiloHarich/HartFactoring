@@ -60,17 +60,17 @@ public class LemireInheritTrialDivision extends PrimeArrayTrialDivision {
             // for hard numbers like big semiprimes finding a factor (early) is unlikely and JIT predicts that
             // the return branch is unlikely -> always the same data processing; preloading the arrays
 
-            if (factorFound (number, primeIndex))    return getFactor(primeIndex);
+            if (hasPrimeFactor(number, primeIndex))    return getPrimeFactor(primeIndex);
             // unrolling 4 times for Lemire long seems to be optimal
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
-            if (factorFound (number, ++primeIndex))  return getFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
+            if (hasPrimeFactor(number, ++primeIndex))  return getPrimeFactor(primeIndex);
             // you might just copy the lines at the end to enable more lanes e.g. for AVX-512
         }
         return -1;
     }
 
-    public boolean factorFound(long number, int primeIndex) {
+    public boolean hasPrimeFactor(long number, int primeIndex) {
         // multiply number and primeModularInverted (overflow can happen!)
         long product = number * modularInverse[primeIndex];
         // if product (unsigned) is lower than the limit,

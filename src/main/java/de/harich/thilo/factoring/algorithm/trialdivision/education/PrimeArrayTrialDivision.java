@@ -24,16 +24,16 @@ public class PrimeArrayTrialDivision extends ScalarTrialDivision {
         ensurePrimesExist(maxPrimeFactor);
     }
     @Override
-    public int[] findFactorIndices(long number, int maxPrimeFactor){
+    public int[] findPrimefactorIndices(long number, int maxPrimeFactor){
         int maxPrimeFactorIndex = ensurePrimesExist(maxPrimeFactor);
-        return super.findFactorIndices(number, maxPrimeFactorIndex);
+        return super.findPrimefactorIndices(number, maxPrimeFactorIndex);
     }
 
     public int findSingleFactor(long number, int maxPrimeFactor) {
         int maxPrimeFactorIndex = ensurePrimesExist(maxPrimeFactor);
         // usually a proper upper limit and unrollig the code helps the vectorisation, but I can not see speedup
         for (int primeIndex = 0; primeIndex < maxPrimeFactorIndex; primeIndex++) {
-            if (factorFound (number, primeIndex)) return getFactor(primeIndex);
+            if (hasPrimeFactor(number, primeIndex)) return getPrimeFactor(primeIndex);
 //            if (factorFound (number, ++primeIndex)){return getFactor(primeIndex);}
         }
         return -1;
@@ -50,8 +50,8 @@ public class PrimeArrayTrialDivision extends ScalarTrialDivision {
     }
 
     @Override
-    public int getFactor(int factorIndex) {
-        return primes[factorIndex];
+    public int getPrimeFactor(int primeFactorIndex) {
+        return primes[primeFactorIndex];
     }
 }
 

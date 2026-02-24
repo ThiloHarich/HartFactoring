@@ -23,7 +23,7 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
     }
 
     @Override
-    public int [] findFactorIndices(long number, int maxPrimeFactorIndex) {
+    public int [] findPrimefactorIndices(long number, int maxPrimeFactorIndex) {
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(maxPrimeFactorIndex);
         int[] primeFactorIndices = new int[numberBits];
         int factorIndex = 0;
@@ -37,7 +37,7 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
         int offsetIndex = 0;
 
         while (factor <= maxPrimeFactorIndex) {
-            if (factorFound(number, factor)) {
+            if (hasPrimeFactor(number, factor)) {
                 primeFactorIndices[factorIndex++] = factor;
             }
             // Sprung zum nächsten Kandidaten
@@ -65,7 +65,7 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
         int offsetIndex = 0;
 
         while (factor <= maxPrimeFactorIndex) {
-            if (factorFound(number, factor)) return factor;
+            if (hasPrimeFactor(number, factor)) return factor;
             factor += OFFSETS[offsetIndex];
             offsetIndex = (offsetIndex + 1) & 7;
         }
@@ -76,10 +76,10 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
         return -1;
     }
 
-    public boolean factorFound(long number, int factor){
-        double pInverse = 1.0 / factor;
+    public boolean hasPrimeFactor(long number, int primeIndex){
+        double pInverse = 1.0 / primeIndex;
         long numberDivFactor = (long) ((number * pInverse) + ROUND_DOUBLE);
-        return numberDivFactor * factor == number;
+        return numberDivFactor * primeIndex == number;
     }
 
 }

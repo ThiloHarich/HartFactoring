@@ -3,9 +3,12 @@ package de.harich.thilo.factoring;
 import de.harich.thilo.factoring.calculator.*;
 import de.harich.thilo.factoring.validation.NumberValidator;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@Component
 public class FactorisationRunner {
     // TODO find out!!!
     private static final int LEMIRE_TRIAL_BETTER_THAN_HART = 35;
@@ -23,7 +26,7 @@ public class FactorisationRunner {
         }
         String[] numbersAsString = numbers.split(",");
 
-        long[] numbersAsLong = Arrays.stream(numbersAsString).mapToLong(Long::getLong).toArray();
+        long[] numbersAsLong = Arrays.stream(numbersAsString).map(String::trim).mapToLong(Long::parseLong).toArray();
         return getFactorisationOutput(numbersAsLong);
     }
     public String[] getFactorisationOutput(long number){
