@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.algorithm.trialdivision.education;
+package de.harich.thilo.factoring.algorithm.trialdivision.prototype.array;
 
 /**
  * We try to make even more use of Vectorisation here, by precalculating the reciprocals in an array.

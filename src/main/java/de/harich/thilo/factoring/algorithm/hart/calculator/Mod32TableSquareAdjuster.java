@@ -1,6 +1,6 @@
 package de.harich.thilo.factoring.algorithm.hart.calculator;
 
-import de.harich.thilo.factoring.algorithm.hart.calculator.educational.Mod32SquareAdjuster;
+import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.adjust.Mod32SquareAdjuster;
 
 /**
  * Stores the difference of x to the first possible x in a table for odd multipliers.

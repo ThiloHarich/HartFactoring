@@ -1,6 +1,6 @@
 package de.harich.thilo.factoring.algorithm.trialdivision.jml;
 
-import de.harich.thilo.factoring.algorithm.trialdivision.education.PrimeArrayTrialDivision;
+import de.harich.thilo.factoring.algorithm.trialdivision.prototype.array.PrimeArrayTrialDivision;
 
 public class TDiv31Barrett extends PrimeArrayTrialDivision {
 

@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.algorithm.trialdivision.education;
+package de.harich.thilo.factoring.algorithm.trialdivision.prototype.array;
 
 import static de.harich.thilo.math.VectorMath.ROUND_DOUBLE;
 

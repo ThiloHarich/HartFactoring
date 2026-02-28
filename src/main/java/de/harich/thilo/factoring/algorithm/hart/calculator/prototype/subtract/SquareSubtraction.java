@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.algorithm.hart.calculator.educational;
+package de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.sqrt;

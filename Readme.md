@@ -1,11 +1,15 @@
 In this project we provide fast java factoring algorithms for integers up to 63 bits.
-The main goal for this are 
+# Project Goals & Guidelines
 
-- Clean Code
-- a fast implementation of Hart and trial division Factoring algorithms
-- how to use vectorisation in factoring algorithms in Java without loosing readability
-- get hands on some aspects of the algorithm by prepared tests, which can be extended
-- provide a easy-to-use command line interface (on the way)
+The main goals for this project are:
+
+- **Clean Code**: High code quality and maintainability.
+- **High Performance**: Fast and readable implementations of Hart and Trial Division factoring algorithms.
+- **Modern Algorithms**: A Java implementation of "Lemire's Algorithm."
+- **Efficiency**: An array-based, fast version of the Hart "one-line" factoring algorithm.
+- **Vectorization**: Leveraging Java's vectorization capabilities without losing readability.
+- **Benchmarking**: Prepared performance comparisons across different implementations and prototypes.
+- **Usability**: An easy-to-use frontend and a REST service for number factorization.
 
 # Algorithms
 
@@ -21,12 +25,12 @@ it should be one of the fastest algorithms for long numbers.
 
 ## Lemire Trial Division algorithm 
 
-Since the main loop is simple java can also make use of vectorisation.
+Since the main loop is simple java can also make use of vectorization.
 The fastest algorithm uses no divisions, which are expensive.
 It uses just long values (casting to double and back to long), and such has a good 
 performance on cpu's which support SSE, AVX.
 Lemire's approach is from 2019 and relatively new, and has good support from 
-java and cpu's with vectorisation support.
+java and cpu's with vectorization support.
 On SSE-2 We se 250% speedup compared to using a multiplications with the Reciprocals
 instead of using a division together with a rounding trick which avoids expensive type conversions.
 We see 1200% improvement over division and rounding.
@@ -38,50 +42,50 @@ Thilo Harich a java software developer.
 # Credits 
 Tilman Neumann - for the great joint work on the Hart algorithm.
 
-# Starten des Projekts (Backend und Frontend)
+# Getting Started (Backend and Frontend)
 
-Das Projekt ist eine Spring Boot Anwendung, bei der das Frontend (Thymeleaf) fest in das Backend integriert ist. Sobald Sie den Server starten, ist auch das Frontend automatisch erreichbar.
+The project is a Spring Boot application where the frontend (Thymeleaf) is integrated into the backend. Once you start the server, the frontend is automatically accessible.
 
-## 1. Starten über IntelliJ IDEA (Empfohlen)
-1.  Öffnen Sie die Datei `src/main/java/de/harich/thilo/factoring/FactoringApplication.java`.
-2.  Klicken Sie auf den **grünen Play-Button** links neben der Zeile `public class FactoringApplication` oder bei der `main`-Methode.
-3.  Wählen Sie **"Run 'FactoringApplication'"** oder **"Debug 'FactoringApplication'"** (wenn Sie Breakpoints nutzen möchten).
+## 1. Running via IntelliJ IDEA (Recommended)
+1. Open the file `src/main/java/de/harich/thilo/factoring/FactoringApplication.java`.
+2. Click the **green play button** next to the `public class FactoringApplication` line or the `main` method.
+3. Select **"Run 'FactoringApplication'"** or **"Debug 'FactoringApplication'"** (if you want to use breakpoints).
 
-## 2. Starten über die Konsole (Gradle)
-Öffnen Sie ein Terminal im Projektordner und geben Sie ein:
+## 2. Running via Terminal (Gradle)
+Open a terminal in the project folder and enter:
 ```powershell
 ./gradlew bootRun
 ```
 
-## 3. Zugriff auf das Frontend
-Sobald die Anwendung gestartet ist (Sie sehen im Log `Started FactoringApplication in ... seconds`), rufen Sie im Browser folgende URL auf:
+## 3. Accessing the Frontend
+Once the application has started (you will see `Started FactoringApplication in ... seconds` in the log), open the following URL in your browser:
 
 ### **[http://localhost:8080/](http://localhost:8080/)**
 
-*Hinweis: Verwenden Sie **nicht** den Chrome-Button oben rechts in der IntelliJ-HTML-Ansicht (Port 63342), da dieser nur eine statische Vorschau ohne Funktion zeigt.*
+*Note: Do **not** use the Chrome button in the top right of the IntelliJ HTML view (port 63342), as it only shows a static preview without functionality.*
 
-## Wichtige Voraussetzungen
-*   **Java Version**: Gemäß Ihrer `build.gradle` benötigt das Projekt **Java 24**. Stellen Sie sicher, dass in IntelliJ unter *File > Project Structure > Project* das richtige SDK (Java 24) eingestellt ist.
-*   **Port**: Falls Port 8080 bereits belegt ist, würde die Anwendung mit einem Fehler abbrechen. In diesem Fall müsste der Port in der `application.properties` geändert werden.
+## Prerequisites
+* **Java Version**: According to your `build.gradle`, the project requires **Java 24**. Ensure that the correct SDK (Java 24) is set in IntelliJ under *File > Project Structure > Project*.
+* **Port**: If port 8080 is already in use, the application will fail to start. In this case, the port would need to be changed in `application.properties`.
 
-# Docker (für das Hosting)
+# Docker (for Hosting)
 
-Um die Anwendung auf Plattformen wie Render.com oder Railway.app zu hosten, die Docker unterstützen, wurde ein `Dockerfile` hinzugefügt.
+To host the application on platforms like Render.com or Railway.app that support Docker, a `Dockerfile` has been added.
 
-**Wichtig:** Sie müssen Docker **nicht** auf Ihrem eigenen Computer installiert haben, um die Anwendung bei einem Cloud-Anbieter zu hosten. Der Anbieter (z.B. Render) nutzt das `Dockerfile` automatisch.
+**Important:** You do **not** need to have Docker installed on your own computer to host the application with a cloud provider. The provider (e.g., Render) uses the `Dockerfile` automatically.
 
-## Lokal mit Docker bauen und starten (Optional)
-*Hinweis: Dies erfordert die Installation von [Docker Desktop](https://www.docker.com/products/docker-desktop/). Wenn Docker nicht installiert ist, erhalten Sie die Fehlermeldung: "Die Benennung 'docker' wurde nicht als Name eines Cmdlet erkannt".*
+## Building and Running Locally with Docker (Optional)
+*Note: This requires [Docker Desktop](https://www.docker.com/products/docker-desktop/). If Docker is not installed, you will receive an error message: "The term 'docker' was not recognized as the name of a cmdlet".*
 
-1. **Image bauen:**
+1. **Build the image:**
    ```powershell
    docker build -t hart-factoring .
    ```
-2. **Container starten:**
+2. **Start the container:**
    ```powershell
    docker run -p 8080:8080 hart-factoring
    ```
-Die Anwendung ist dann wieder unter `http://localhost:8080/` erreichbar.
+The application will then be accessible at `http://localhost:8080/`.
 
-## Hosting-Hinweis
-Bei Cloud-Anbietern (wie Render) wählen Sie beim Erstellen des Web-Services einfach **Docker** als Runtime aus. Das System erkennt das `Dockerfile` im Root-Verzeichnis automatisch, baut das Image und startet den Server.
+## Hosting Note
+With cloud providers (like Render), simply select **Docker** as the runtime when creating the web service. The system will automatically detect the `Dockerfile` in the root directory, build the image, and start the server.

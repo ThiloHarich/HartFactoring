@@ -1,6 +1,8 @@
-package de.harich.thilo.factoring.algorithm.trialdivision.education;
+package de.harich.thilo.factoring.algorithm.trialdivision.prototype;
 
-public class ScalarReciprocalTrialDivision extends ScalarTrialDivision{
+import de.harich.thilo.factoring.algorithm.trialdivision.baseline.ScalarTrialDivision;
+
+public class ScalarReciprocalTrialDivision extends ScalarTrialDivision {
 
     // calculating the reciprocal and casting is faster than doing a division,
     // we have to add a value to avoid casting problems but still ~ 20% faster

@@ -65,28 +65,29 @@ public class FactorisationRunner {
         long firstNumber = numbers[0];
         FactorisationCalculator factorisationCalculator = getBestFactorisationByLength(firstNumber);
         // we might use FactorisationLemireHartRough also in case of FactorisationCalculatorLemireInt
-        if (factorisationCalculator instanceof LemireHartSmoothFactorisationCalculator) {
-            sortedPrimeFactorsArray[0] = factorisationCalculator.getSortedPrimeFactors(firstNumber);
-            long biggestPrime = sortedPrimeFactorsArray[0][sortedPrimeFactorsArray[0].length - 1];
-            int biggestPrimeBits = Long.numberOfTrailingZeros(biggestPrime);
-
-            if (biggestPrimeBits > firstNumber / 4) {
-                factorisationCalculator = lemireHartRough;
-            }
-        }
-        for (int i = 1; i < numbers.length; i++) {
+//        if (factorisationCalculator instanceof LemireHartSmoothFactorisationCalculator) {
+//            sortedPrimeFactorsArray[0] = factorisationCalculator.getSortedPrimeFactors(firstNumber);
+//            long biggestPrime = sortedPrimeFactorsArray[0][sortedPrimeFactorsArray[0].length - 1];
+//            int biggestPrimeBits = Long.numberOfTrailingZeros(biggestPrime);
+//
+//            if (biggestPrimeBits > firstNumber / 4) {
+//                factorisationCalculator = lemireHartRough;
+//            }
+//        }
+        for (int i = 0; i < numbers.length; i++) {
             sortedPrimeFactorsArray[i] = factorisationCalculator.getSortedPrimeFactors(numbers[i]);
         }
         return sortedPrimeFactorsArray;
     }
 
     FactorisationCalculator getBestFactorisationByLength(long number){
-        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
-        if (numberBits <= Integer.SIZE)
-           return lemireInt;
-        if(numberBits < LEMIRE_TRIAL_BETTER_THAN_HART)
-            return lemireLong;
-        return lemireHartSmooth;
+        return lemireLong;
+//        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
+//        if (numberBits <= Integer.SIZE)
+//           return lemireInt;
+//        if(numberBits < LEMIRE_TRIAL_BETTER_THAN_HART)
+//            return lemireLong;
+//        return lemireHartSmooth;
     }
 
     public static String toCsvString(long[] factors) {

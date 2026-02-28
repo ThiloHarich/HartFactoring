@@ -33,13 +33,13 @@ public class TestData {
                 .toList();
     }
 
-    public static long[] makePrimesOfSameSizeList(int bits, int numNumbers, double biggestPrimeExponent) {
+    public static long[] makePrimesOfSameSizeList(int bits, int numNumbers, double primeExponent) {
         long[] numbers = new long[numNumbers];
 
-        double logBiggestPrime = bits * biggestPrimeExponent;
-        final int targetPrime = (int) (pow(2.0, logBiggestPrime));
+        double primeExponentBits = bits * primeExponent;
+        final int targetPrime = (int) (pow(2.0, primeExponentBits));
         final int targetProduct = (int) (pow(2.0, bits));
-        int numPrimes = (int) (1/biggestPrimeExponent);
+        int numPrimes = (int) (1/primeExponent);
 
         int[] targetPrimes = SmallPrimes.generatePrimes (targetPrime, numNumbers * numPrimes);
 
@@ -54,7 +54,7 @@ public class TestData {
             long lastFactor = targetProduct / product;
             numbers[i] =  product * lastFactor;
         }
-        System.out.println("created " + numbers.length + " products of " + numPrimes + " primes of size n^" + biggestPrimeExponent);
+        System.out.println("created " + numbers.length + " products of " + numPrimes + " primes of size n^" + primeExponent);
 
         return numbers;
     }
@@ -64,7 +64,8 @@ public class TestData {
 
         double logSmallerPrime = bits * lowerSemiprimeExponent;
         final int targetSmallerPrime = (int) (pow(2.0, logSmallerPrime));
-        final int targetBiggerPrime = (int) pow(2.0, bits) / targetSmallerPrime;
+//        final int targetBiggerPrime = (int) pow(2.0, bits) / targetSmallerPrime;
+        final int targetBiggerPrime = (int) pow(2.0, (bits - logSmallerPrime)) ;
 
         int[] smallerPrimes = SmallPrimes.generatePrimes (targetSmallerPrime, numSemiPrimes);
         int[]  biggerPrimes = SmallPrimes.generatePrimes (targetBiggerPrime, numSemiPrimes);

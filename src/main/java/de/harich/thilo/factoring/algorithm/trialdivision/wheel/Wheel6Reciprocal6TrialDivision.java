@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.algorithm.trialdivision.education;
+package de.harich.thilo.factoring.algorithm.trialdivision.wheel;
 
 public class Wheel6Reciprocal6TrialDivision extends Wheel6TrialDivision {
 

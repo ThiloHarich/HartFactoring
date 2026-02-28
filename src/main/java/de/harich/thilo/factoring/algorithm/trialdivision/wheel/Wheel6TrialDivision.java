@@ -1,4 +1,6 @@
-package de.harich.thilo.factoring.algorithm.trialdivision.education;
+package de.harich.thilo.factoring.algorithm.trialdivision.wheel;
+
+import de.harich.thilo.factoring.algorithm.trialdivision.baseline.ScalarTrialDivision;
 
 /**
  * Speedup over ScalarTrialDivision is 300%, which is since we have

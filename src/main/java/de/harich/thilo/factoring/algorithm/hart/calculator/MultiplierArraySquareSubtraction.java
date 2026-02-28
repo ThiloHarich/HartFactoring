@@ -1,6 +1,6 @@
 package de.harich.thilo.factoring.algorithm.hart.calculator;
 
-import de.harich.thilo.factoring.algorithm.hart.calculator.educational.SqrtArraySquareSubtraction;
+import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract.SqrtArraySquareSubtraction;
 import de.harich.thilo.math.SmallPrimes;
 
 import java.util.Arrays;
@@ -68,7 +68,7 @@ public class MultiplierArraySquareSubtraction extends SqrtArraySquareSubtraction
         // TODO going with the big array -> performance is not consistent and is higher
         int limit43Bit = 50000; // n^1/3 * 3
         int limit63Bit = (MULTIPLIERS_LIMIT_50_BIT) * 3; // n^1/3 * 3
-        long[] smoothMultipliers = createMultipliersByMultiplerSequences(limit43Bit, filterBadMultipliers);
+        long[] smoothMultipliers = createMultipliersByMultiplerSequences(MULTIPLIERS_LIMIT_50_BIT, filterBadMultipliers);
 
         // you can use booth methods, for Mod32TableSquareAdjuster initializeWithMultipliersAndLength seems to work
 //        initializeMultipliersWithoutLoopOptimisation(smoothMultipliers);

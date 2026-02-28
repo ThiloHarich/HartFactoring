@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.algorithm.trialdivision.education;
+package de.harich.thilo.factoring.algorithm.trialdivision.baseline;
 
 import de.harich.thilo.factoring.algorithm.trialdivision.TrialDivisionAlgorithm;
 

@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.algorithm.trialdivision.education;
+package de.harich.thilo.factoring.algorithm.trialdivision.prototype.array;
 
 /**
  * This is slower than the double implementation ReciprocalArrayTrialDivision.

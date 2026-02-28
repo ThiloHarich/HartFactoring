@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.algorithm.trialdivision.education;
+package de.harich.thilo.factoring.algorithm.trialdivision.prototype.array;
 
 /**
  * We use the Lemire trick to check if a int values is dividable by a number.

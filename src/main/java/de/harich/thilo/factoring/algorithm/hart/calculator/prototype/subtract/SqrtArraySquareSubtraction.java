@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.algorithm.hart.calculator.educational;
+package de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract;
 
 /**
  * This class helps to find solutions of the 'fermat' equation x^2 - k*n = y^2.
@@ -24,7 +24,7 @@ public class SqrtArraySquareSubtraction
     long baseMultiplier = 3*3*5*7;
 
     // 21 BIT should be enough for number around 21*3 = 63 BIT = unsigned long
-    protected static final int MULTIPLIERS_LIMIT_50_BIT = 1 << 17;
+    protected static final int MULTIPLIERS_LIMIT_50_BIT = 1 << 20;
 
     // SIMD/AVX operations work on arrays, here it is. Let the JIT do the optimization
     private static double [] sqrtMultiplier;

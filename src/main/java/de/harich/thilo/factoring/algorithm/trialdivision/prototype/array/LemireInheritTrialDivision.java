@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.algorithm.trialdivision.education;
+package de.harich.thilo.factoring.algorithm.trialdivision.prototype.array;
 
 /**
  * Lemire is around 60% faster than the fastest algorithm based on reciprocal values to determine

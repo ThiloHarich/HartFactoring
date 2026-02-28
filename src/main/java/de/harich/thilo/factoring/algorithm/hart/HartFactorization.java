@@ -3,8 +3,8 @@ package de.harich.thilo.factoring.algorithm.hart;
 import de.harich.thilo.factoring.algorithm.FactorisationAlgorithm;
 import de.harich.thilo.factoring.algorithm.hart.calculator.Mod32TableSquareAdjuster;
 import de.harich.thilo.factoring.algorithm.hart.calculator.MultiplierArraySquareSubtraction;
-import de.harich.thilo.factoring.algorithm.hart.calculator.educational.SquareAdjuster;
-import de.harich.thilo.factoring.algorithm.hart.calculator.educational.SquareSubtraction;
+import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.adjust.SquareAdjuster;
+import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract.SquareSubtraction;
 import de.harich.thilo.math.BinaryGreatestCommonDivisorEngine;
 
 /**

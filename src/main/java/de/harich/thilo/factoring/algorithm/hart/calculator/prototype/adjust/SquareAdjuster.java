@@ -1,4 +1,4 @@
-package de.harich.thilo.factoring.algorithm.hart.calculator.educational;
+package de.harich.thilo.factoring.algorithm.hart.calculator.prototype.adjust;
 
 /**
  * This class helps finding solutions of the 'fermat' equation x^2 - n = y^2, by adjusting x by some criteria.

@@ -1,5 +1,6 @@
-package de.harich.thilo.factoring.algorithm.trialdivision.education;
+package de.harich.thilo.factoring.algorithm.trialdivision.prototype.array;
 
+import de.harich.thilo.factoring.algorithm.trialdivision.baseline.ScalarTrialDivision;
 import de.harich.thilo.math.SmallPrimes;
 
 import java.util.Arrays;

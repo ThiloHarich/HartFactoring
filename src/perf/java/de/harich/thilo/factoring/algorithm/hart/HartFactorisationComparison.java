@@ -1,58 +1,35 @@
-package de.harich.thilo.factoring.algorithm;
+package de.harich.thilo.factoring.algorithm.hart;
 
-
-import de.harich.thilo.factoring.algorithm.trialdivision.education.PrimeArrayTrialDivision;
-import de.harich.thilo.factoring.algorithm.trialdivision.education.PrimeReciprocalTrialDivision;
-import de.harich.thilo.factoring.algorithm.trialdivision.education.ReciprocalArrayTrialDivision;
-import de.harich.thilo.factoring.algorithm.trialdivision.education.ScalarTrialDivision;
-import de.harich.thilo.factoring.algorithm.hart.HartFactorization;
+import de.harich.thilo.factoring.TestData;
+import de.harich.thilo.factoring.algorithm.FactorisationAlgorithm;
 import de.harich.thilo.factoring.algorithm.hart.calculator.Mod32TableSquareAdjuster;
 import de.harich.thilo.factoring.algorithm.hart.calculator.MultiplierArraySquareSubtraction;
-import de.harich.thilo.factoring.algorithm.hart.calculator.educational.Mod32SquareAdjuster;
-import de.harich.thilo.factoring.algorithm.hart.calculator.educational.SquareAdjuster;
-import de.harich.thilo.factoring.algorithm.hart.calculator.educational.SquareSubtraction;
-import de.harich.thilo.factoring.algorithm.hart.calculator.educational.SqrtArraySquareSubtraction;
-
-
+import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.adjust.Mod32SquareAdjuster;
+import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.adjust.SquareAdjuster;
+import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract.SqrtArraySquareSubtraction;
+import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract.SquareSubtraction;
 import de.harich.thilo.factoring.algorithm.trialdivision.LemireTrialDivision;
-import de.harich.thilo.math.SmallPrimes;
-import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class FactorisationCalculatorAlgorithmCompareTest {
+import static java.lang.Math.pow;
 
 
-    @Test
-    public void compareTrialDivisionPerformanceFor41Bit(){
-        final int bits = 41	;
-        int maxPrime = (int) (1L << (bits /2));
-        final int numPrimes = 10000;
-
-        boolean readFromFile = true;
-        final long start = System.currentTimeMillis();
-        long[] semiprimes = SmallPrimes.makeSemiPrimesList(bits, numPrimes, readFromFile, .37);
-        final long lap1 = System.currentTimeMillis();
-        System.out.println("time for making Primes : " + (lap1 - start));
-
-        // TODO find out if we can use fma if the call is slower than doing "*" and "+"
-        boolean useFusedMultipleAdd = false;
-        FactorisationAlgorithm[] algorithms = {
+public class HartFactorisationComparison {
 
 
-                new LemireTrialDivision(),
-//                new FloatReciprocalTrialDivisionAlgorithm(),
-                new ReciprocalArrayTrialDivision(),
-                new PrimeReciprocalTrialDivision(maxPrime),
-                new PrimeArrayTrialDivision(maxPrime)
-//                new ScalarTrialDivisionAlgorithm(),
-//                new VectorizedTrialDivisionAlgorithm(maxPrime)
-        };
-        logTimings(lap1, algorithms, semiprimes);
+    // a Value which steers the estimated time the test will take
+    public static final long RUNNING_TIME = (1L << 29);
+
+    public static void main(String[] args) {
+        comparePerformance();
     }
+
     /**
+     * Input n^a
+     * running lemire O(n^a / (a*log(n))
+     * running hart O (n^1/3)
+     * n^a / (a*log(n) = n^1/3  | log
+     * a * n - log(a * log(n) = 1/3 * n
+     * a = 1/3 + log(a)/n + log(n)/n
      * We should see something like
      * #Name of the algorithm                                                        :	absolute time 	 relative to best 	 relative to algorithm above
      * MultiplierArraySquareSubtraction filter/Mod32TableSquareAdjuster             :    	54818200	 1.0000000000000182	 0.025526713591779916
@@ -68,38 +45,47 @@ public class FactorisationCalculatorAlgorithmCompareTest {
      * SquareSubtraction 1/SquareAdjuster                                           :    	500695400	 9.13374390257267	 1.3081891512055335
      * PrimeDivisionTrialDivisionAlgorithm                                          :    	767366800	 13.998394693733358	 1.5326020570590422
      */
-    @Test
-    public void comparePerformanceFor41Bit(){
-        final int bits = 41	;
-        final int numPrimes = 100000;
 
-        boolean readFromFile = true;
+    public static void comparePerformance(){
+        final int bits = 25 ;
+        // here we try to find the point where Lemire and Hart have the same running time.
+        // this is the point where we should switch form Lemire to Hart. Hart is independent of the size of the
+        // factors
+        double primeExponent = getPrimeExponent(bits);
+
+        final int numPrimes = (int) pow(2.0, bits * primeExponent * .6);
         final long start = System.currentTimeMillis();
-        long[] numbersToFactorize = SmallPrimes.makeSemiPrimesList(bits, numPrimes, readFromFile, .37);
+        long[] numbersToFactorize = TestData.makeSemiprimeList(bits, numPrimes, primeExponent);
         final long lap1 = System.currentTimeMillis();
+        System.out.println("bits: " + bits + " primeExponent: " + primeExponent + " numPrimes: " + numPrimes);
         System.out.println("time for making Primes : " + (lap1 - start));
 
-        boolean useFusedMultipleAdd = false;
         FactorisationAlgorithm[] algorithms = {
+                new LemireTrialDivision(),
                 new HartFactorization(new MultiplierArraySquareSubtraction(true, 43), new Mod32TableSquareAdjuster()),
                 new HartFactorization(new MultiplierArraySquareSubtraction(false, 43), new Mod32TableSquareAdjuster()),
                 new HartFactorization(new MultiplierArraySquareSubtraction(false, 43), new Mod32SquareAdjuster()),
-//                new HartFactorizationAlgorithm(new MultiplierSequenceCalculator(false), new FermatXAdjuster()),
                 new HartFactorization(new SqrtArraySquareSubtraction(), new Mod32TableSquareAdjuster()),
                 new HartFactorization(new SqrtArraySquareSubtraction(), new Mod32SquareAdjuster()),
-//                new HartFactorizationAlgorithm(new SqrtArraySquareMultiplierSubtractor(), new SquareAdjuster()),
-//                new HartFactorizationAlgorithm(new DifferenceOfSquaresCalculator(315), new FermatMod32Table()),
                 new HartFactorization(new SquareSubtraction(315), new Mod32SquareAdjuster()),
-                new LemireTrialDivision(),
                 new HartFactorization(new SquareSubtraction(1), new Mod32SquareAdjuster()),
                 new HartFactorization(new SquareSubtraction(315), new SquareAdjuster()),
-//                new HartFactorizationAlgorithm(new DifferenceOfSquaresCalculator(1), new FermatMod32Table()),
-
-                new ReciprocalArrayTrialDivision(),
-                new HartFactorization(new SquareSubtraction(1), new SquareAdjuster()),
-                new PrimeReciprocalTrialDivision()
+                new HartFactorization(new SquareSubtraction(1), new SquareAdjuster())
         };
         logTimings(lap1, algorithms, numbersToFactorize);
+    }
+
+    private static double getPrimeExponent(int bits) {
+        if (bits >= 50) return 0.39;
+        if (bits >= 40) return interpolate(bits, 40, 50, 0.40, 0.39);
+        if (bits >= 30) return interpolate(bits, 30, 40, 0.42, 0.40);
+        if (bits >= 25) return interpolate(bits, 25, 30, 0.45, 0.42);
+        if (bits >= 20) return interpolate(bits, 20, 25, 0.50, 0.45);
+        return 0.50;
+    }
+
+    private static double interpolate(double x, double x1, double x2, double y1, double y2) {
+        return y1 + (x - x1) * (y2 - y1) / (x2 - x1);
     }
 
     public static void logTimings(long lap1, FactorisationAlgorithm[] algorithms, long[] numbersToFactorize) {
@@ -112,7 +98,7 @@ public class FactorisationCalculatorAlgorithmCompareTest {
         for (FactorisationAlgorithm algorithm : algorithms){
             long lastTime = minTime;
             minTime = factorize(algorithm, numbersToFactorize, false);
-            double relativeTime = ((double) minTime) / overallMin;
+            double relativeTime = overallMin == Long.MAX_VALUE ? 1 : ((double) minTime) / overallMin;
             double relativeToLast = minTime / (lastTime + 0.0);
             final String name = String.format("%-75s", algorithm.getName());
             System.out.println(name + "  :    \t" +  minTime + " \t " + relativeTime + "\t " + relativeToLast);
@@ -122,54 +108,10 @@ public class FactorisationCalculatorAlgorithmCompareTest {
         }
     }
 
-    @Test
-    public void improvePerformanceFor41Bit() {
-        final int bits = 41;
-        final int numPrimes = 10000;
-
-        boolean readFromFile = true;
-        final long start = System.currentTimeMillis();
-        long[] semiprimes = SmallPrimes.makeSemiPrimesList(bits, numPrimes, readFromFile, .37);
-        final long lap1 = System.currentTimeMillis();
-        System.out.println("time for making Primes : " + (lap1 - start));
-
-        int maxPrimeFactor = (int) (1L << bits/2);
-        List<FactorisationAlgorithm> algorithms = List.of(
-                new LemireTrialDivision(),
-//                new TrialDivisionAlgorithm(maxPrimeFactor)
-                new ScalarTrialDivision()
-        );
-
-        final long lap2 = System.currentTimeMillis();
-        
-        System.out.println("time for initializing all algorithms : " + (lap2 - lap1));
-
-        long[] minTime = new long[2];
-
-        int index = 0;
-        for (FactorisationAlgorithm algorithm : algorithms){
-            minTime[index++] = factorize(algorithm, semiprimes, true);
-        }
-        double relation = (minTime[0] + 0.0)/minTime[1];
-        if (relation < 1){
-            relation = 1/relation;
-        }
-        System.out.println("relation : " + relation);
-
-    }
     public static long factorize(FactorisationAlgorithm factorizer, long[] numbersToFactorize, boolean print) {
-
-
         long minTime = Long.MAX_VALUE;
 
         minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, true));
-//        for (int n = 1; n < 32; n+=2) {
-//            for (int i = 0; i < 32; i++) {
-//                String hit = String.format("%4d", ((Wheel120ArrayTrialDivision) factorizer).hits[n][i]);
-//                System.out.print(hit);
-//            }
-//            System.out.println();
-//        }
         minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, false));
         minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, false));
         minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, false));
@@ -180,13 +122,18 @@ public class FactorisationCalculatorAlgorithmCompareTest {
     protected static long factorizeIt(final FactorisationAlgorithm algorithm, final long[] numbersToFactorize, boolean print, boolean test) {
         algorithm.findSingleFactor(15);
         final long start = System.nanoTime();
-        for (final Long number : numbersToFactorize) {
-            long factor = algorithm.findSingleFactor(number);
-            if (test){
-                long semiprimeMaybe = factor * ((int) (number / factor));
-                if (semiprimeMaybe != number)
-                    System.out.println();
-                assertEquals(semiprimeMaybe, number);
+        double totalFactorisations = RUNNING_TIME / Math.pow(numbersToFactorize[0], 0.4);
+
+        for (int i = 0; i < totalFactorisations; ) {
+            for (int j = 0; j < numbersToFactorize.length && i < totalFactorisations; j++, i++) {
+                long number = numbersToFactorize[j];
+                long factor = algorithm.findSingleFactor(number);
+                if (test) {
+                    long semiprimeMaybe = factor * (number / factor);
+                    if (semiprimeMaybe != number) {
+                        System.out.println("Error: " + number + " != " + factor + " * " + (number / factor));
+                    }
+                }
             }
         }
 
