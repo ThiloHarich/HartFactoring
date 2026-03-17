@@ -51,3 +51,8 @@ test {
     // Die Test-Worker-Prozesse von Gradle brauchen das Modul ebenfalls
 //    jvmArgs += ["--add-modules", "jdk.incubator.vector"]
 }
+
+task runLemireComparison(type: JavaExec) {
+    classpath = sourceSets.perf.runtimeClasspath
+    mainClass = 'de.harich.thilo.factoring.calculator.LemireFactorisationComparison'
+}

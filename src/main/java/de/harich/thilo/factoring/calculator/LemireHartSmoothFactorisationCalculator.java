@@ -13,6 +13,7 @@ import java.util.stream.IntStream;
  * TODO make an CLI interface to factorize a buch of number
  */
 public class LemireHartSmoothFactorisationCalculator implements FactorisationCalculator {
+    public static final double INV_LOG_2 = 1.0 / Math.log(2);
 
     // TODO this might overflow WeakHashMap? or remove completely?
 //    Map<Long, List<Factor>> factorizations = new HashMap<>();
@@ -39,7 +40,7 @@ public class LemireHartSmoothFactorisationCalculator implements FactorisationCal
     @Override
     public long[] getSortedPrimeFactors(long number) {
         // TODO check for existing factorisation!?
-        int maxPrimeFactor = (int) Math.cbrt(number);
+        int maxPrimeFactor = (int) Math.pow(number, getLemireExponent(Math.log(number) * INV_LOG_2));
         long[] primeFactors = smallFactorsAlgorithm.findAllPrimeFactors(number, maxPrimeFactor);
         boolean isNumberFactorized = primeFactors[0] < 0 && - primeFactors[0] != number;
         if (isNumberFactorized){
@@ -56,6 +57,19 @@ public class LemireHartSmoothFactorisationCalculator implements FactorisationCal
         primeFactors[index] = sortedBigPrimeFactors[1];
         return primeFactors;
 
+    }
+
+    public static double getLemireExponent(double bits) {
+        if (bits >= 50) return 0.39;
+        if (bits >= 40) return interpolate(bits, 40, 50, 0.40, 0.39);
+        if (bits >= 30) return interpolate(bits, 30, 40, 0.42, 0.40);
+        if (bits >= 25) return interpolate(bits, 25, 30, 0.45, 0.42);
+        if (bits >= 20) return interpolate(bits, 20, 25, 0.50, 0.45);
+        return 0.50;
+    }
+
+    private static double interpolate(double x, double x1, double x2, double y1, double y2) {
+        return y1 + (x - x1) * (y2 - y1) / (x2 - x1);
     }
 
     static long[] addSmallFactors(long number, int[] factorIndices, long[] smallPrimeFactorList,

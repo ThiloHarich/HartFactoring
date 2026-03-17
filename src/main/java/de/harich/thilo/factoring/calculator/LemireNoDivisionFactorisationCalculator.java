@@ -1,11 +1,11 @@
 package de.harich.thilo.factoring.calculator;
 
-import de.harich.thilo.factoring.algorithm.trialdivision.LemireTrialDivision;
+import de.harich.thilo.factoring.algorithm.trialdivision.LemireUnaryTrialDivision;
 import de.harich.thilo.math.MillerRabin;
 
-public class LemireFactorisationCalculator implements FactorisationCalculator {
+public class LemireNoDivisionFactorisationCalculator implements FactorisationCalculator {
 
-    LemireTrialDivision factorisationAlgorithm = new LemireTrialDivision();
+    LemireUnaryTrialDivision factorisationAlgorithm = new LemireUnaryTrialDivision();
 
     @Override
     public long[] getSortedPrimeFactors(long number) {

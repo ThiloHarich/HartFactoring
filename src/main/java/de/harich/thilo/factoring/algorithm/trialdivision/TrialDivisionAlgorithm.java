@@ -13,12 +13,13 @@ public interface TrialDivisionAlgorithm extends FactorisationAlgorithm {
      */
     int[] findPrimefactorIndices(long number, int maxPrimeFactorIndex);
 
-//    /**
-//     * finds all prime factors dividing the number.
-//     * A prime factor is added to the list x times if it divides the number x times.
-//     * Should be used, when all prime factors are lower than getFactor(maxPrimeFactorIndex)
-//     */
-//    long[] findAllFactors(long number, int maxPrimeFactorIndex);
+    /**
+     * finds all prime factors dividing the number.
+     * A prime factor is added to the list x times if it divides the number x times.
+     */
+    default long[] findAllPrimeFactors(long number, int maxPrimeFactor) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 
     boolean hasPrimeFactor(long number, int primeIndex);
 

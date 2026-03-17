@@ -9,6 +9,7 @@ import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.adjust.Squa
 import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract.SqrtArraySquareSubtraction;
 import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract.SquareSubtraction;
 import de.harich.thilo.factoring.algorithm.trialdivision.LemireTrialDivision;
+import de.harich.thilo.factoring.calculator.LemireHartSmoothFactorisationCalculator;
 
 import static java.lang.Math.pow;
 
@@ -51,7 +52,7 @@ public class HartFactorisationComparison {
         // here we try to find the point where Lemire and Hart have the same running time.
         // this is the point where we should switch form Lemire to Hart. Hart is independent of the size of the
         // factors
-        double primeExponent = getPrimeExponent(bits);
+        double primeExponent = LemireHartSmoothFactorisationCalculator.getLemireExponent(bits);
 
         final int numPrimes = (int) pow(2.0, bits * primeExponent * .6);
         final long start = System.currentTimeMillis();
@@ -75,18 +76,7 @@ public class HartFactorisationComparison {
         logTimings(lap1, algorithms, numbersToFactorize);
     }
 
-    private static double getPrimeExponent(int bits) {
-        if (bits >= 50) return 0.39;
-        if (bits >= 40) return interpolate(bits, 40, 50, 0.40, 0.39);
-        if (bits >= 30) return interpolate(bits, 30, 40, 0.42, 0.40);
-        if (bits >= 25) return interpolate(bits, 25, 30, 0.45, 0.42);
-        if (bits >= 20) return interpolate(bits, 20, 25, 0.50, 0.45);
-        return 0.50;
-    }
 
-    private static double interpolate(double x, double x1, double x2, double y1, double y2) {
-        return y1 + (x - x1) * (y2 - y1) / (x2 - x1);
-    }
 
     public static void logTimings(long lap1, FactorisationAlgorithm[] algorithms, long[] numbersToFactorize) {
         final long lap2 = System.currentTimeMillis();
@@ -96,8 +86,10 @@ public class HartFactorisationComparison {
 
         System.out.println("Name of the algorithm                                                        :\tabsolute time \t relative to best \t relative to algorithm above");
         for (FactorisationAlgorithm algorithm : algorithms){
+            // warmup
+            findSingleFactor(algorithm, numbersToFactorize, true);
             long lastTime = minTime;
-            minTime = factorize(algorithm, numbersToFactorize, false);
+            minTime = findSingleFactor(algorithm, numbersToFactorize, false);
             double relativeTime = overallMin == Long.MAX_VALUE ? 1 : ((double) minTime) / overallMin;
             double relativeToLast = minTime / (lastTime + 0.0);
             final String name = String.format("%-75s", algorithm.getName());
@@ -108,18 +100,7 @@ public class HartFactorisationComparison {
         }
     }
 
-    public static long factorize(FactorisationAlgorithm factorizer, long[] numbersToFactorize, boolean print) {
-        long minTime = Long.MAX_VALUE;
-
-        minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, true));
-        minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, false));
-        minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, false));
-        minTime = Math.min(minTime, factorizeIt(factorizer, numbersToFactorize, print, false));
-
-        return minTime;
-    }
-
-    protected static long factorizeIt(final FactorisationAlgorithm algorithm, final long[] numbersToFactorize, boolean print, boolean test) {
+    protected static long findSingleFactor(final FactorisationAlgorithm algorithm, final long[] numbersToFactorize, boolean test) {
         algorithm.findSingleFactor(15);
         final long start = System.nanoTime();
         double totalFactorisations = RUNNING_TIME / Math.pow(numbersToFactorize[0], 0.4);
@@ -138,8 +119,8 @@ public class HartFactorisationComparison {
         }
 
         long time = System.nanoTime() - start;
-        final String name = String.format("%-75s", algorithm.getName());
-        if (print) System.out.println("time : \t" + name + " \t" + time);
+//        final String name = String.format("%-75s", algorithm.getName());
+//        if (print) System.out.println("time : \t" + name + " \t" + time);
         return time;
     }
 }

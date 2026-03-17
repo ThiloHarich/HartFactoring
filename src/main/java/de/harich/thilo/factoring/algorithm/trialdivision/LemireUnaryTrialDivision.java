@@ -3,22 +3,19 @@ package de.harich.thilo.factoring.algorithm.trialdivision;
 import de.harich.thilo.math.MillerRabin;
 import de.harich.thilo.math.SmallPrimes;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
-import static de.harich.thilo.factoring.calculator.LemireHartSmoothFactorisationCalculator.addFactor2;
+import static de.harich.thilo.factoring.calculator.LemireHartSmoothFactorisationCalculator.*;
 
 /**
- * Lemire is around 60% faster than the fastest algorithm based on reciprocal values to determine
- * the dividability of a number (which is ReciprocalArrayTrialDivision)
- * on old SSE-2 vectorisation infrastructure.
- * It is around 3 times faster as if we use reciprocal values and rounding to convert
- * doubles into long values PrimeReciprocalTrialDivision.
- * In this implementation we use arrays. Lemire does the calculation completely in long arrays.
- * We do not need to convert double data to long, compared to ReciprocalTrialDivision
- * were we are using double values for multiplying with the reciprocal value to do the division.
- * This might be the main speed advantage.
+ * Is a faster? variant of trial division. We still check if the number is dividable by a factor with the Lemire
+ * check. But instead of dividing out the factor and factor^i we just collect the factor index and reduce
+ * the size of the number by the log of the factor. So we can approximate if we have factored the number
+ * completely. In a second step we multiply together the factors and check if this is already the number
+ * to be factorized.
  */
-public class LemireTrialDivision implements TrialDivisionAlgorithm {
+public class LemireUnaryTrialDivision implements TrialDivisionAlgorithm {
 
     public static final int END_OF_FACTOR_LIST = -1;
     public static final double LOG_2 = Math.log(2.0);
@@ -28,11 +25,11 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
     private static double[] primefactorLength;
 //    static double[] reciprocals;
 
-    public LemireTrialDivision() {
+    public LemireUnaryTrialDivision() {
         ensurePrimesExist(0);
         ensureLemireDataExists();
     }
-    public LemireTrialDivision(int maxPrimeFactor) {
+    public LemireUnaryTrialDivision(int maxPrimeFactor) {
         ensurePrimesExist(maxPrimeFactor);
         ensureLemireDataExists();
     }
@@ -77,103 +74,55 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
     public int[] findPrimefactorIndices(long number, int maxPrimeFactor) {
         int maxPrimeFactorIndex = ensurePrimesExist(maxPrimeFactor);
         ensureLemireDataExists();
-        calculatePrimeFactorLength();
+        ensurePrimeFactorLengthExists();
         return calculatePrimefactorIndices(number, maxPrimeFactorIndex);
     }
 
-    private void calculatePrimeFactorLength() {
-        primefactorLength = new double[primes.length];
-        for (int i = 0; i < primes.length; i++) {
-            long prime = primes[i];
-            primefactorLength [i] = Math.log(prime) / LOG_2;
-        }
-    }
-
-    public long[] findAllPrimeFactors(long number, int maxPrimeFactor) {
-        int maxPrimeFactorIndex = ensurePrimesExist(maxPrimeFactor);
-        ensureLemireDataExists();
-        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
-        long[] primeFactors = new long[numberBits];
-        int trailingZeros = Long.numberOfTrailingZeros(number);
-        number = number >> trailingZeros;
-        int factorIndex = addFactor2(primeFactors, trailingZeros);
-        // if is a power of 2 we can exit directly
-        if (number == 1) {
-            markAsFactorized(primeFactors);
-            return primeFactors;
-        }
-        for (int primeFactorIndex = 1; primeFactorIndex <= maxPrimeFactorIndex; primeFactorIndex++) {
-            if (hasPrimeFactor(number, primeFactorIndex)){
-                int primeFactor = getPrimeFactor(primeFactorIndex);
-                do {
-                    primeFactors[factorIndex++] = primeFactor;
-                    number = number / primeFactor;
-//                    number = (long) (number * ((double) 1 / primeFactor) + ROUND_DOUBLE);
-//                    number = (long) (number * reciprocals[primeFactorIndex] + ROUND_DOUBLE);
-
-                } while ((hasPrimeFactor(number, primeFactorIndex)));
-                if (number == 1) {
-                    markAsFactorized(primeFactors);
-                    return primeFactors;
-                }
-//                if (MillerRabin.isProbablePrime(number)) {
-//                    primeFactors[factorIndex++] = number;
-//                    markAsFactorized(primeFactors);
-//                    return primeFactors;
-//                }
+    public void ensurePrimeFactorLengthExists() {
+        if (primefactorLength == null || primefactorLength.length < primes.length) {
+            primefactorLength = new double[primes.length];
+            for (int i = 0; i < primes.length; i++) {
+                long prime = primes[i];
+                primefactorLength[i] = Math.log(prime) * INV_LOG_2;
             }
         }
-        // store the remaining number as last factor, and mark it
-//        primeFactors[factorIndex[0]] = -number;
-        primeFactors[factorIndex] = -number;
-        return primeFactors;
-    }
-    private long divideByFactor(long number, long[] primeFactors, int[] factorIndex, int i){
-        int primeFactor = getPrimeFactor(i);
-        do {
-            primeFactors[factorIndex[0]++] = primeFactor;
-            // TODO we might speed this up by using reciprocals
-            number = number / primeFactor;
-        } while ((hasPrimeFactor(number, i)));
-        return number;
     }
 
-    private static void markAsFactorized(long[] primeFactors) {
-        primeFactors[0] = - primeFactors[0];
-    }
-
-    public int[] calculateFactorIndices(long number, int maxPrimeFactorIndex) {
-        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
-        int[] primeFactorIndices = new int[numberBits];
-        int factorIndex = 0;
-        for (int i = 1; i < maxPrimeFactorIndex; i++) {
-            // for hard numbers like big semiprimes finding a factor (early) is unlikely and JIT predicts that
-            // the return branch is unlikely -> always the same data processing; preloading the arrays
-            // you might just copy the lines at the end to enable more lanes e.g. for AVX-512
-            // TODO how to support different AVX ? For SSE-2 4 but not 8 statements are optimal
-            if (hasPrimeFactor(number, i)) primeFactorIndices[factorIndex++] = i;
-//            if (factorFound(number, ++i)) primeFactorIndices[factorIndex++] = i;
-
+    @Override
+    public long[] findAllPrimeFactors(long number, int maxPrimeFactor) {
+        if (MillerRabin.isProbablePrime(number)) {
+            return new long[]{number};
         }
-        primeFactorIndices[factorIndex] = NO_FACTOR_FOUND;
-        return primeFactorIndices;
+        int[] primeFactorIndices = findPrimefactorIndices(number, maxPrimeFactor);
+        return Arrays.stream(primeFactorIndices)
+                .takeWhile(index -> index != -1) // Nimm alles, bis die -1 kommt
+//                .filter(index -> index > 0)      // Nur positive Werte
+                .map(index -> getPrimeFactor(index)) // Umwandeln
+                .asLongStream().toArray();
     }
 
     public int[] calculatePrimefactorIndices(long number, int maxPrimeFactorIndex) {
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
-        double factorizedThreshold = numberBits - 4;
+        // For a prime p > 2 with prob 1/p^i we forget a factor p^i. We only count a factor p
+        // even if we do not count any  size in this case, the values over all numbers is reduced by
+        // 1/(p^i-1)/p^i = 1/(1 - 1/p^i).
+        // for a given i we have the reduced size < 1/zeta(i) (zeta also considers p=2).
+        // the product of all Zeta values is a small constant smaller 3
+        // handling p=2 (which gives the biggest term) correctly should reduce the constant even more
+        int sizeOfFactorsNotFoundBySieving = 3;
+        double factorizedThreshold = numberBits - sizeOfFactorsNotFoundBySieving;
         int[] primeFactorIndices = new int[numberBits];
-        int trailingZeros = Long.numberOfTrailingZeros(number);
-//        number = number >> trailingZeros;
-        int storeIndex = addFactorIndex2(primeFactorIndices, trailingZeros);
-
+        int times2DividesNumber = Long.numberOfTrailingZeros(number);
+//        number = number >> times2DividesNumber;
+        int storeIndex = addFactorIndexFor2(primeFactorIndices, times2DividesNumber);
 
         if (number == 1) {
             // mark the end and return in case of a power of 2
             primeFactorIndices[storeIndex] = END_OF_FACTOR_LIST;
             return primeFactorIndices;
         }
-        double factorSize = trailingZeros;
+        double factorSize = times2DividesNumber;
+        int checkForLastPrimeIndex = (int) Math.cbrt(number);
         for (int primeFactorIndex = 1; primeFactorIndex < maxPrimeFactorIndex; primeFactorIndex++) {
             if (hasPrimeFactor(number, primeFactorIndex)) {
                 primeFactorIndices[storeIndex++] = primeFactorIndex;
@@ -184,13 +133,21 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
                 if (factorSize >= factorizedThreshold){
                     return addMultiplePrimeFactors(number, storeIndex, primeFactorIndices);
                 }
+                long remaining = number * modularInverse[primeFactorIndex];
+
+                // if number divided by factors is a prime itself we can stop early
+//                if (primeFactorIndex > checkForLastPrimeIndex && MillerRabin.isProbablePrime(remaining)) {
+//                    // This is only a hint, it's safer to let addMultiplePrimeFactors handle it
+//                    // but we can already stop the search
+//                    return addMultiplePrimeFactors(number, storeIndex, primeFactorIndices);
+//                }
             }
         }
-//        primeFactorIndices[storeIndex] = NO_FACTOR_FOUND;
-        return primeFactorIndices;
+        // Threshold not reached, can happen if we have many or big prime Factors multiple times
+        return addMultiplePrimeFactors(number, storeIndex, primeFactorIndices);
     }
 
-    private int addFactorIndex2(int[] primeFactorIndices, int trailingZeros) {
+    private int addFactorIndexFor2(int[] primeFactorIndices, int trailingZeros) {
         int index = 0;
         for (int i = 0; i < trailingZeros; i++) {
             primeFactorIndices[index++] = 0;
@@ -204,25 +161,28 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
             int primeFactorIndex = primeFactorIndices[storedPrimeFactorIndex];
             productOfFactors *= getPrimeFactor(primeFactorIndex);
         }
-        // happy case number has no prime factors with an exponent > 1 in its prime factorisation
+        // happy case number has no prime factors with an exponent > 1 in its prime factorization
         boolean isNumberFactorized = number == productOfFactors;
         if (isNumberFactorized){
             primeFactorIndices[lastStoreIndex] = END_OF_FACTOR_LIST;
             return primeFactorIndices;
         }
-        // find the primes with exponent > 1 in its prime factorisation
-        int numberWithoutSimpleFactors = (int) (number * (1L / productOfFactors));
+        // find the primes with exponent > 1 in its prime factorization
+        int numberWithoutSimpleFactors = (int) (number * (1.0 / productOfFactors));
         int[] multiplePrimeFactorIndices = new int[primeFactorIndices.length];
         int storedPrimeFactorIndex = 0;
         int multipleStoreIndex = 0;
         while (numberWithoutSimpleFactors > 1 && storedPrimeFactorIndex < lastStoreIndex) {
-            do {
-                multiplePrimeFactorIndices[multipleStoreIndex++] = primeFactorIndices[storedPrimeFactorIndex];
-                numberWithoutSimpleFactors *= (int) (1.0 / getPrimeFactor(storedPrimeFactorIndex));
-            } while (numberWithoutSimpleFactors > 1 && hasPrimeFactor(number, storedPrimeFactorIndex));
+            int primeFactorIndex = primeFactorIndices[storedPrimeFactorIndex];
+            while (numberWithoutSimpleFactors > 1 && hasPrimeFactor(number, primeFactorIndex)) {
+                multiplePrimeFactorIndices[multipleStoreIndex++] = primeFactorIndex;
+                double oneDivPrime = 1.0 / getPrimeFactor(primeFactorIndex);
+                numberWithoutSimpleFactors = (int) (numberWithoutSimpleFactors * oneDivPrime);
+            }
             storedPrimeFactorIndex++;
         }
         // copy the simple factors at the end
+        storedPrimeFactorIndex = 0;
         while (primeFactorIndices[storedPrimeFactorIndex] > 0) {
             multiplePrimeFactorIndices[multipleStoreIndex++] = primeFactorIndices[storedPrimeFactorIndex++];
         }
