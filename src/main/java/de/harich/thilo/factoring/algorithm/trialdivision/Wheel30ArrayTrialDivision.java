@@ -23,22 +23,22 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
     }
 
     @Override
-    public int [] findPrimefactorIndices(long number, int maxPrimeFactorIndex) {
+    public long[] findAllPrimeFactors(long number, int maxPrimeFactorIndex) {
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(maxPrimeFactorIndex);
-        int[] primeFactorIndices = new int[numberBits];
+        long[] primeFactors = new long[numberBits];
         int factorIndex = 0;
 
         // Basis-Primzahlen prüfen
-        if (number % 2 == 0) primeFactorIndices[factorIndex++] = 2;
-        if (number % 3 == 0) primeFactorIndices[factorIndex++] = 3;
-        if (number % 5 == 0) primeFactorIndices[factorIndex++] = 5;
+        if (number % 2 == 0) primeFactors[factorIndex++] = 2;
+        if (number % 3 == 0) primeFactors[factorIndex++] = 3;
+        if (number % 5 == 0) primeFactors[factorIndex++] = 5;
 
         int factor = 7;
         int offsetIndex = 0;
 
         while (factor <= maxPrimeFactorIndex) {
             if (hasPrimeFactor(number, factor)) {
-                primeFactorIndices[factorIndex++] = factor;
+                primeFactors[factorIndex++] = factor;
             }
             // Sprung zum nächsten Kandidaten
             factor += OFFSETS[offsetIndex];
@@ -47,13 +47,13 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
             offsetIndex = (offsetIndex + 1) & 7; // Schneller als % 8
         }
 
-        primeFactorIndices[factorIndex] = -1;
-        return primeFactorIndices;
+        primeFactors[factorIndex] = -1;
+        return primeFactors;
     }
 
     @Override
     public long findSingleFactor(long number) {
-        return findSingleFactor(number, (int) Math.sqrt(number));
+        return findSingleFactor(number, (int) Math.sqrt(number) + 1);
     }
 
     public int findSingleFactor(long number, int maxPrimeFactorIndex) {

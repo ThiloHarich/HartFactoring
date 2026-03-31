@@ -9,7 +9,7 @@ import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.adjust.Squa
 import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract.SqrtArraySquareSubtraction;
 import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract.SquareSubtraction;
 import de.harich.thilo.factoring.algorithm.trialdivision.LemireTrialDivision;
-import de.harich.thilo.factoring.calculator.LemireHartSmoothFactorisationCalculator;
+import de.harich.thilo.factoring.calculator.FactorisationService;
 
 import static java.lang.Math.pow;
 
@@ -22,6 +22,7 @@ public class HartFactorisationComparison {
 
     public static void main(String[] args) {
         comparePerformance();
+//        compareWithRabinMiller();
     }
 
     /**
@@ -52,10 +53,12 @@ public class HartFactorisationComparison {
         // here we try to find the point where Lemire and Hart have the same running time.
         // this is the point where we should switch form Lemire to Hart. Hart is independent of the size of the
         // factors
-        double primeExponent = LemireHartSmoothFactorisationCalculator.getLemireExponent(bits);
+        double primeExponent = FactorisationService.getLemireExponent(bits);
 
         final int numPrimes = (int) pow(2.0, bits * primeExponent * .6);
         final long start = System.currentTimeMillis();
+        // here we make numbers which ensure LemireTrialDivision runs up to the cross-over exponent.
+        // in this way we have determined the LemireExponent
         long[] numbersToFactorize = TestData.makeSemiprimeList(bits, numPrimes, primeExponent);
         final long lap1 = System.currentTimeMillis();
         System.out.println("bits: " + bits + " primeExponent: " + primeExponent + " numPrimes: " + numPrimes);
@@ -75,7 +78,6 @@ public class HartFactorisationComparison {
         };
         logTimings(lap1, algorithms, numbersToFactorize);
     }
-
 
 
     public static void logTimings(long lap1, FactorisationAlgorithm[] algorithms, long[] numbersToFactorize) {

@@ -9,26 +9,27 @@ public class ScalarTrialDivision implements TrialDivisionAlgorithm {
 
     public ScalarTrialDivision() {
     }
-    @Override
-    public int [] findPrimefactorIndices(long number, int maxPrimeFactorIndex) {
-        return addFactorsFoundIndices(number, maxPrimeFactorIndex);
-    }
 
-    protected int[] addFactorsFoundIndices(long numberToFactorize, int maxPrimeFactorIndex) {
+    public long[] findAllPrimeFactors(long numberToFactorize, int maxPrimeFactor) {
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(numberToFactorize);
-        int[] primeFactorIndices = new int[numberBits];
+        long[] primeFactors = new long[numberBits];
         int factorIndex = 0;
-        for (int i = 1; i < maxPrimeFactorIndex; i++) {
+        int primeFactorIndex = 1;
+        int primeFactor;
+        do {
+            primeFactor = getPrimeFactor(primeFactorIndex);
             // for hard numbers like big semiprimes finding a factor (early) is unlikely and JIT predicts that
             // the return branch is unlikely -> always the same data processing; preloading the arrays
             // you might just copy the lines at the end to enable more lanes e.g. for AVX-512
             // TODO how to support different AVX ? For SSE-2 4 but not 8 statements are optimal
-            if (hasPrimeFactor(numberToFactorize, i)) {
-                primeFactorIndices[factorIndex++] = i;
+            // TODO is using a method with primeFactor not the index faster?
+            if (hasPrimeFactor(numberToFactorize, primeFactorIndex)) {
+                primeFactors[factorIndex++] = primeFactor;
             }
-        }
-        primeFactorIndices[factorIndex] = -1;
-        return primeFactorIndices;
+            primeFactorIndex++;
+        } while (primeFactor <= maxPrimeFactor);
+        primeFactors[factorIndex] = -1;
+        return primeFactors;
     }
 
     public int findSingleFactor(long number, int maxPrimeFactor) {
@@ -49,7 +50,7 @@ public class ScalarTrialDivision implements TrialDivisionAlgorithm {
 
     @Override
     public long findSingleFactor(long number) {
-        return findSingleFactor(number, (int) Math.sqrt(number));
+        return findSingleFactor(number, (int) Math.sqrt(number) + 1);
     }
 
 

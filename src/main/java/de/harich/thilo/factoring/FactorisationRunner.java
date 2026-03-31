@@ -10,13 +10,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class FactorisationRunner {
-    // TODO find out!!!
-    private static final int LEMIRE_TRIAL_BETTER_THAN_HART = 35;
-
-    FactorisationCalculator lemireInt = new FactorisationCalculatorLemireInt();
-    FactorisationCalculator lemireLong = new LemireFactorisationCalculator();
-    FactorisationCalculator lemireHartSmooth = new LemireHartSmoothFactorisationCalculator();
-    FactorisationCalculator lemireHartRough = new LemireHartRoughFactorisationCalculator();
+    FactorisationService factorisationService = new FactorisationService(.35);
 
     NumberValidator numberValidator = new NumberValidator();
 
@@ -52,9 +46,7 @@ public class FactorisationRunner {
     }
 
     long[] getSortedPrimeFactors(long number) {
-        FactorisationCalculator factorisationCalculator = getBestFactorisationByLength(number);
-//        return factorisationCalculator.getSortedPrimeFactors(number);
-        return Arrays.stream(factorisationCalculator.getSortedPrimeFactors(number))
+        return Arrays.stream(factorisationService.getSortedPrimeFactors(number))
                 .filter(v -> v != 0)
                 .map(Math::abs)
                 .toArray();
@@ -62,33 +54,13 @@ public class FactorisationRunner {
 
     long[][] getSortedPrimeFactors(long[] numbers) {
         long[][] sortedPrimeFactorsArray = new long[numbers.length][];
-        long firstNumber = numbers[0];
-        FactorisationCalculator factorisationCalculator = getBestFactorisationByLength(firstNumber);
-        // we might use FactorisationLemireHartRough also in case of FactorisationCalculatorLemireInt
-//        if (factorisationCalculator instanceof LemireHartSmoothFactorisationCalculator) {
-//            sortedPrimeFactorsArray[0] = factorisationCalculator.getSortedPrimeFactors(firstNumber);
-//            long biggestPrime = sortedPrimeFactorsArray[0][sortedPrimeFactorsArray[0].length - 1];
-//            int biggestPrimeBits = Long.numberOfTrailingZeros(biggestPrime);
-//
-//            if (biggestPrimeBits > firstNumber / 4) {
-//                factorisationCalculator = lemireHartRough;
-//            }
-//        }
+
         for (int i = 0; i < numbers.length; i++) {
-            sortedPrimeFactorsArray[i] = factorisationCalculator.getSortedPrimeFactors(numbers[i]);
+            sortedPrimeFactorsArray[i] = factorisationService.getSortedPrimeFactors(numbers[i]);
         }
         return sortedPrimeFactorsArray;
     }
 
-    FactorisationCalculator getBestFactorisationByLength(long number){
-        return lemireLong;
-//        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
-//        if (numberBits <= Integer.SIZE)
-//           return lemireInt;
-//        if(numberBits < LEMIRE_TRIAL_BETTER_THAN_HART)
-//            return lemireLong;
-//        return lemireHartSmooth;
-    }
 
     public static String toCsvString(long[] factors) {
         return Arrays.stream(factors)

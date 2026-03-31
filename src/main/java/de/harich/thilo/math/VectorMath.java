@@ -32,4 +32,16 @@ public class VectorMath {
     public static long round (double number) {
         return (long) ((number) + ROUND_DOUBLE);
     }
+
+    public static boolean isPerfectSquare(long n) {
+        if (n < 0) return false;
+        // Die letzten 4 Bits einer Quadratzahl in Hex sind nur 0, 1, 4, 9
+        long h = n & 0xF;
+        if (h > 9) return false;
+        if (h != 2 && h != 3 && h != 5 && h != 6 && h != 7 && h != 8) {
+            long t = (long) Math.sqrt(n);
+            return t * t == n;
+        }
+        return false;
+    }
 }

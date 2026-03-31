@@ -56,13 +56,5 @@ public class ReciprocalArrayTrialDivision extends PrimeReciprocalTrialDivision {
         return -1;
     }
 
-    @Override
-    public int[] findPrimefactorIndices(long number, int maxPrimeFactor){
-        // will also be called in the super method
-        ensurePrimesExist(maxPrimeFactor);
-        // this line is new
-        ensureReciprocalsExist();
-        return super.findPrimefactorIndices(number, maxPrimeFactor);
-    }
 }
 

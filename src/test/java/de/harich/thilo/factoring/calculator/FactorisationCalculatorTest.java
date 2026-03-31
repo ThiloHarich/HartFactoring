@@ -15,7 +15,7 @@ public class FactorisationCalculatorTest {
 
     @Test
     public void testFactorisationCorrectness(){
-        LemireHartSmoothFactorisationCalculator factorization = new LemireHartSmoothFactorisationCalculator(new LemireTrialDivision());
+        FactorisationService factorization = new FactorisationService(-1.0);
 //        int fromIndex = (int) 1L << 20;
         int fromIndex = 235133;
         int length = 1000;
@@ -37,13 +37,11 @@ public class FactorisationCalculatorTest {
     public void comparePerformanceOnSemiprimes(){
         // TODO  cross over should be at prime (n^1/3) ~ n^(1/3) * log(n^1/3)
         // ~ n^(1/3) * const * numberBits(n^1/3)
-        FactorisationCalculator[] calculators = {
+        FactorisationService[] calculators = {
 //                new FactorisationCalculatorLemireInt(),
-                new LemireCollectFactorisationCalculator(),
-                new LemireFactorisationCalculator(),
-                new HartFactorisationCalculator(),
-                new LemireHartSmoothFactorisationCalculator(new LemireTrialDivision()),
-                new LemireHartRoughFactorisationCalculator(new LemireTrialDivision())
+                new FactorisationService(1),
+                new FactorisationService(.39),
+//                new LemireHartRoughFactorisationCalculator(new LemireTrialDivision())
         } ;
 
 
@@ -55,7 +53,7 @@ public class FactorisationCalculatorTest {
 //        long[] numbersToFactorize = SmallPrimes.makeSemiPrimesList(bits, numPrimes, readFromFile, .25);
             //
 //            List<Long> numbersToFactorize = TestData.makeSemiprimeList(bits);
-            double smallExponent = .2;
+            double smallExponent = .4;
             final int numPrimes = (int) pow(2.0, bits * smallExponent) / bits;
             long[] numbersToFactorize = TestData.makePrimesOfSameSizeList(bits, numPrimes, smallExponent);
             long lap1 = System.nanoTime();
@@ -63,7 +61,7 @@ public class FactorisationCalculatorTest {
             System.out.println("Name of the factorization                                                        :\tabsolute time \t relative to best ");
 
             long minTime = Long.MAX_VALUE;
-            for (FactorisationCalculator calculator : calculators) {
+            for (FactorisationService calculator : calculators) {
 
                 // two times warmup
                 doFactorisation(calculator, numbersToFactorize, true);
@@ -87,19 +85,19 @@ public class FactorisationCalculatorTest {
         }
     }
 
-    private static void doFactorisation(FactorisationCalculator calculator, long[] numbersToFactorize, boolean verifyResult) {
+    private static void doFactorisation(FactorisationService calculator, long[] numbersToFactorize, boolean verifyResult) {
         for (long number : numbersToFactorize) {
             long[] primeFactors = calculator.getSortedPrimeFactors(number);
             long product = 1;
             if (verifyResult) {
-                for (int i = 0; i < primeFactors.length && primeFactors[i] != -1; i++) {
-                    product *= primeFactors[i];
+                for (long primeFactor : primeFactors) {
+                    product *= primeFactor;
                 }
-                assertEquals(number, product);
+                assertEquals(number, product, "calculator : " + calculator);
             }
         }
     }
-    private static void doFactorisation(FactorisationCalculator calculator, List<Long> numbersToFactorize) {
+    private static void doFactorisation(FactorisationService calculator, List<Long> numbersToFactorize) {
         for (long number : numbersToFactorize) {
             calculator.getSortedPrimeFactors(number);
         }

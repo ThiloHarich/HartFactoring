@@ -98,26 +98,7 @@ public class HartFactorization implements FactorisationAlgorithm {
         return calculator.getName() + "/" + squareAdjuster.getName();
     }
 
-    /**
-     * TODO at the moment you can only use it if no primes below n^1/3 exist -> only 2 factors exist.
-     * Both are >= n^1/3 -> both mut be prime
-     */
-    public void addPrimeFactorsAboveCubicRoot(long numberToFactorize, long[] bigPrimeFactorList) {
-        int index = 0;
-        int stopAt = (int) Math.cbrt(numberToFactorize) + 1;
-        long primeFactor0 = findSingleFactor(numberToFactorize, stopAt);
-        if (primeFactor0 > 1){
-            bigPrimeFactorList[index++] = primeFactor0;
-        }
-        long primeFactor1 = numberToFactorize / Math.abs(primeFactor0);
-        if (primeFactor1 != 1){
-            bigPrimeFactorList[index] = primeFactor1;
-        }
-        if (primeFactor1 > 0 && primeFactor1 < primeFactor0){
-            bigPrimeFactorList[0] = primeFactor1;
-            bigPrimeFactorList[1] = primeFactor0;
-        }
-    }
+
     public long findSingleFactor(final long number) {
         return findSingleFactor(number, UNDEFINED);
     }

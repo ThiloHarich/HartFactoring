@@ -43,14 +43,15 @@ public class TestData {
 
         int[] targetPrimes = SmallPrimes.generatePrimes (targetPrime, numNumbers * numPrimes);
 
-
-        for (int i=0; i < numNumbers; i++)
+        for (int i=0; i < numNumbers ; i++)
         {
             long product = 1;
-
-            for (int j = i*numPrimes;j < (i+1)*numPrimes -1; j++) {
+            int j = i*numPrimes;
+            do {
                 product *= targetPrimes[j];
-            }
+                j++;
+            } while(j < (i+1)*numPrimes && product * pow(targetPrime, 1.5) < targetProduct);
+
             long lastFactor = targetProduct / product;
             numbers[i] =  product * lastFactor;
         }
