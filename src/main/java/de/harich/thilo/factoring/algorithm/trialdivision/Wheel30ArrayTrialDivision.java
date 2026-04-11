@@ -23,8 +23,8 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
     }
 
     @Override
-    public long[] findAllPrimeFactors(long number, int maxPrimeFactorIndex) {
-        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(maxPrimeFactorIndex);
+    public long[] findAllPrimeFactors(long number) {
+        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
         long[] primeFactors = new long[numberBits];
         int factorIndex = 0;
 
@@ -36,6 +36,7 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
         int factor = 7;
         int offsetIndex = 0;
 
+        int maxPrimeFactorIndex = (int) (Math.sqrt(number) + 1);
         while (factor <= maxPrimeFactorIndex) {
             if (hasPrimeFactor(number, factor)) {
                 primeFactors[factorIndex++] = factor;
@@ -46,8 +47,6 @@ public class Wheel30ArrayTrialDivision implements TrialDivisionAlgorithm {
             // Index im Array rotieren (0-7)
             offsetIndex = (offsetIndex + 1) & 7; // Schneller als % 8
         }
-
-        primeFactors[factorIndex] = -1;
         return primeFactors;
     }
 

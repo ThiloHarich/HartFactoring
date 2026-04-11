@@ -9,12 +9,14 @@ import de.harich.thilo.factoring.algorithm.trialdivision.baseline.ScalarTrialDiv
  */
 public class Wheel30TrialDivision extends ScalarTrialDivision {
 
+    int oneLoopIncrement = 30;
+
     public Wheel30TrialDivision() {
     }
 
     @Override
-    public long[] findAllPrimeFactors(long number, int maxPrimeFactorIndex){
-        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(maxPrimeFactorIndex);
+    public long[] findAllPrimeFactors(long number){
+        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
         long[] primeFactors = new long[numberBits];
         int factorIndex = 0;
 
@@ -26,26 +28,27 @@ public class Wheel30TrialDivision extends ScalarTrialDivision {
         // Wir starten bei 7 (der erste Kandidat nach der 1 im ersten 30er Block)
         // Die Abstände (Increments) zwischen den 8 Kandidaten sind:
         // 4, 2, 4, 2, 4, 6, 2, 6 (Summe = 30)
+
+        int maxPrimeFactorIndex = (int) (Math.sqrt(number) + 1) + oneLoopIncrement;
+
         for (int factor = 7; factor <= maxPrimeFactorIndex; ) {
             if (hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 7
             factor += 4;
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 11
+            if (hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 11
             factor += 2;
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 13
+            if (hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 13
             factor += 4;
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 17
+            if (hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 17
             factor += 2;
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 19
+            if (hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 19
             factor += 4;
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 23
+            if (hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 23
             factor += 6;
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 29
+            if (hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 29
             factor += 2;
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 31 (Start nächster Block)
+            if (hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor; // 31 (Start nächster Block)
             factor += 6;
         }
-
-        primeFactors[factorIndex] = -1;
         return primeFactors;
     }
 
@@ -55,22 +58,22 @@ public class Wheel30TrialDivision extends ScalarTrialDivision {
         if (number % 3 == 0) return 3;
         if (number % 5 == 0) return 5;
 
-        for (int factor = 7; factor <= maxPrimeFactorIndex; ) {
+        for (int factor = 7; factor <= maxPrimeFactorIndex + oneLoopIncrement; ) {
             if (hasPrimeFactor(number, factor)) return factor;
             factor += 4; // 11
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
+            if (hasPrimeFactor(number, factor)) return factor;
             factor += 2; // 13
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
+            if (hasPrimeFactor(number, factor)) return factor;
             factor += 4; // 17
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
+            if (hasPrimeFactor(number, factor)) return factor;
             factor += 2; // 19
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
+            if (hasPrimeFactor(number, factor)) return factor;
             factor += 4; // 23
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
+            if (hasPrimeFactor(number, factor)) return factor;
             factor += 6; // 29
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
+            if (hasPrimeFactor(number, factor)) return factor;
             factor += 2; // 31
-            if (factor <= maxPrimeFactorIndex && hasPrimeFactor(number, factor)) return factor;
+            if (hasPrimeFactor(number, factor)) return factor;
             factor += 6; // Nächster Zyklus
         }
         return -1;

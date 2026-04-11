@@ -41,7 +41,7 @@ public class TrialDivisionComparison {
 
 
     public static void compareSemiPrimePerformanceForBits(int bits){
-        final int numPrimes = 10000;
+        final int numPrimes = 1000;
         int maxPrime = (int) (1L << (bits /2));
         boolean readFromFile = true;
         final long start = System.currentTimeMillis();
@@ -71,7 +71,8 @@ public class TrialDivisionComparison {
                 new ScalarTrialDivision(),
         };
 
-        logTimings(lap1, algorithms, semiprimes);
+        long testLength = 100_000_000;
+        logTimings(lap1, algorithms, semiprimes, testLength);
     }
 
 }

@@ -1,14 +1,12 @@
 package de.harich.thilo.math;
 
-import jakarta.annotation.Nonnull;
-
 public class MillerRabin {
 
     /**
      * Fast Miller-Rabin primality test for long values.
      * For n < 3,825,123,056,546,413,051, it is sufficient to test a = 2, 3, 5, 7, 11, 13, 17, 19, 23.
      */
-    public static boolean isProbablePrime(long n) {
+    public static boolean isPrime(long n) {
         if (n < 2) return false;
         if (n == 2 || n == 3) return true;
         if (n % 2 == 0 || n % 3 == 0) return false;

@@ -1,13 +1,15 @@
-package de.harich.thilo.factoring.calculator;
+package de.harich.thilo.factoring.service;
 
 import de.harich.thilo.factoring.FactorisationRunner;
 import de.harich.thilo.factoring.TestData;
-import de.harich.thilo.factoring.algorithm.trialdivision.LemireTrialDivision;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
+
+import static de.harich.thilo.factoring.service.FactorisationType.TRIAL_DIVISION_AND_HART;
+import static de.harich.thilo.factoring.service.FactorisationType.TRIAL_DIVISION_ONLY;
 import static java.lang.Math.pow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,7 +17,7 @@ public class FactorisationCalculatorTest {
 
     @Test
     public void testFactorisationCorrectness(){
-        FactorisationService factorization = new FactorisationService(-1.0);
+        FactorisationService factorization = new FactorisationService(TRIAL_DIVISION_AND_HART);
 //        int fromIndex = (int) 1L << 20;
         int fromIndex = 235133;
         int length = 1000;
@@ -38,10 +40,8 @@ public class FactorisationCalculatorTest {
         // TODO  cross over should be at prime (n^1/3) ~ n^(1/3) * log(n^1/3)
         // ~ n^(1/3) * const * numberBits(n^1/3)
         FactorisationService[] calculators = {
-//                new FactorisationCalculatorLemireInt(),
-                new FactorisationService(1),
-                new FactorisationService(.39),
-//                new LemireHartRoughFactorisationCalculator(new LemireTrialDivision())
+                new FactorisationService(TRIAL_DIVISION_ONLY),
+                new FactorisationService(TRIAL_DIVISION_AND_HART),
         } ;
 
 

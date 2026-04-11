@@ -14,19 +14,19 @@ public class Wheel6TrialDivision extends ScalarTrialDivision {
 
 
     @Override
-    public long[] findAllPrimeFactors(long number, int maxPrimeFactorIndex){
-        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(maxPrimeFactorIndex);
+    public long[] findAllPrimeFactors(long number){
+        int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
         long[] primeFactors = new long[numberBits];
         int factorIndex = 0;
         if (number <= 3) primeFactors[factorIndex++] = (int) number;
         if (number % 2 == 0) primeFactors[factorIndex++] =  2;
         if (number % 3 == 0) primeFactors[factorIndex++] =  3;
 
+        int maxPrimeFactorIndex = (int) (Math.sqrt(number) + 1);
         for (int factor = 5; factor <= maxPrimeFactorIndex; factor += 6) {
             if (hasPrimeFactor(number, factor)) primeFactors[factorIndex++] = factor;
             if (hasPrimeFactor(number, factor + 2)) primeFactors[factorIndex++] = factor + 2;
         }
-        primeFactors[factorIndex] = -1;
         return primeFactors;
     }
     @Override

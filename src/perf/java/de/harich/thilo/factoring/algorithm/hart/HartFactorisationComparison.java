@@ -9,7 +9,6 @@ import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.adjust.Squa
 import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract.SqrtArraySquareSubtraction;
 import de.harich.thilo.factoring.algorithm.hart.calculator.prototype.subtract.SquareSubtraction;
 import de.harich.thilo.factoring.algorithm.trialdivision.LemireTrialDivision;
-import de.harich.thilo.factoring.calculator.FactorisationService;
 
 import static java.lang.Math.pow;
 
@@ -53,7 +52,7 @@ public class HartFactorisationComparison {
         // here we try to find the point where Lemire and Hart have the same running time.
         // this is the point where we should switch form Lemire to Hart. Hart is independent of the size of the
         // factors
-        double primeExponent = FactorisationService.getLemireExponent(bits);
+        double primeExponent = .35;
 
         final int numPrimes = (int) pow(2.0, bits * primeExponent * .6);
         final long start = System.currentTimeMillis();
@@ -76,11 +75,11 @@ public class HartFactorisationComparison {
                 new HartFactorization(new SquareSubtraction(315), new SquareAdjuster()),
                 new HartFactorization(new SquareSubtraction(1), new SquareAdjuster())
         };
-        logTimings(lap1, algorithms, numbersToFactorize);
+        logTimings(lap1, algorithms, numbersToFactorize, RUNNING_TIME);
     }
 
 
-    public static void logTimings(long lap1, FactorisationAlgorithm[] algorithms, long[] numbersToFactorize) {
+    public static void logTimings(long lap1, FactorisationAlgorithm[] algorithms, long[] numbersToFactorize, long testLength) {
         final long lap2 = System.currentTimeMillis();
         System.out.println("time for initializing all algorithms : " + (lap2 - lap1));
         long overallMin = Long.MAX_VALUE;
@@ -89,9 +88,9 @@ public class HartFactorisationComparison {
         System.out.println("Name of the algorithm                                                        :\tabsolute time \t relative to best \t relative to algorithm above");
         for (FactorisationAlgorithm algorithm : algorithms){
             // warmup
-            findSingleFactor(algorithm, numbersToFactorize, true);
+            findSingleFactor(algorithm, numbersToFactorize, true, testLength);
             long lastTime = minTime;
-            minTime = findSingleFactor(algorithm, numbersToFactorize, false);
+            minTime = findSingleFactor(algorithm, numbersToFactorize, false, testLength);
             double relativeTime = overallMin == Long.MAX_VALUE ? 1 : ((double) minTime) / overallMin;
             double relativeToLast = minTime / (lastTime + 0.0);
             final String name = String.format("%-75s", algorithm.getName());
@@ -102,10 +101,10 @@ public class HartFactorisationComparison {
         }
     }
 
-    protected static long findSingleFactor(final FactorisationAlgorithm algorithm, final long[] numbersToFactorize, boolean test) {
+    protected static long findSingleFactor(final FactorisationAlgorithm algorithm, final long[] numbersToFactorize, boolean test, long testLength) {
         algorithm.findSingleFactor(15);
         final long start = System.nanoTime();
-        double totalFactorisations = RUNNING_TIME / Math.pow(numbersToFactorize[0], 0.4);
+        double totalFactorisations = testLength / Math.pow(numbersToFactorize[0], 0.4);
 
         for (int i = 0; i < totalFactorisations; ) {
             for (int j = 0; j < numbersToFactorize.length && i < totalFactorisations; j++, i++) {

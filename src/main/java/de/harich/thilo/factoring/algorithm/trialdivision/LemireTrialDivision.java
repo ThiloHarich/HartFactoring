@@ -4,7 +4,6 @@ import de.harich.thilo.math.SmallPrimes;
 
 import java.util.Arrays;
 
-import static de.harich.thilo.factoring.calculator.FactorisationService.addFactor2;
 
 /**
  * Lemire is around 60% faster than the fastest algorithm based on reciprocal values to determine
@@ -19,12 +18,9 @@ import static de.harich.thilo.factoring.calculator.FactorisationService.addFacto
  */
 public class LemireTrialDivision implements TrialDivisionAlgorithm {
 
-    public static final int END_OF_FACTOR_LIST = -1;
-    public static final double LOG_2 = Math.log(2.0);
     public static int[] primes = {2};
     private static long[] modularInverse;
     private static long[] limitIfDividable;
-    private static double[] primefactorLength;
 //    static double[] reciprocals;
 
     public LemireTrialDivision() {
@@ -43,7 +39,7 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
             primes = SmallPrimes.generatePrimes(biggerLimit);
         }
         // TODO check if calculating it by maxPrimeFactor / log (maxPrimeFactor) is faster
-        return Math.abs(Arrays.binarySearch(primes, maxPrimeFactor)) - 1;
+        return Math.abs(Arrays.binarySearch(primes, maxPrimeFactor));
     }
 
     protected void ensureLemireDataExists() {
@@ -73,14 +69,12 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
     }
 
     /**
-     * If first factor is negative number is completely factorized.
-     * If last  factor is negative, the last factor is the number divided by the found factors,
-     * might be used by the next (hart) Factorisation step
-     * @param number
-     * @param maxPrimeFactor
-     * @return
+     * Here we have a upper limit of the factors we want to find. This is needed if Trial division is used in
+     * combination with other algorithms as a first step to filter out some small prime factors.
+     * Since this might not find all prime factors, the result is a new class, which also stores the not found
+     * or remaining factor.
      */
-    public long[] findAllPrimeFactors(long number, int maxPrimeFactor) {
+    public Decomposition findAllPrimeFactors(long number, int maxPrimeFactor) {
         int maxPrimeFactorIndex = ensurePrimesExist(maxPrimeFactor);
         ensureLemireDataExists();
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(number);
@@ -90,8 +84,7 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
         int factorIndex = addFactor2(primeFactors, trailingZeros);
         // if is a power of 2 we can exit directly
         if (number == 1) {
-            markAsFactorized(primeFactors);
-            return primeFactors;
+            return new Decomposition(primeFactors, factorIndex);
         }
         for (int primeFactorIndex = 1; primeFactorIndex <= maxPrimeFactorIndex; primeFactorIndex++) {
             if (hasPrimeFactor(number, primeFactorIndex)){
@@ -104,18 +97,20 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
 
                 } while ((hasPrimeFactor(number, primeFactorIndex)));
                 if (number == 1) {
-                    markAsFactorized(primeFactors);
-                    return primeFactors;
+                    return new Decomposition(primeFactors, factorIndex);
                 }
             }
         }
         // store the remaining number as last factor, and mark it
-        primeFactors[factorIndex] = -number;
-        return primeFactors;
+        return new Decomposition(primeFactors, factorIndex, number);
     }
 
-    private static void markAsFactorized(long[] primeFactors) {
-        primeFactors[0] = - primeFactors[0];
+    public static int addFactor2(long[] primeFactorList, int trailingZeros) {
+        int index = 0;
+        for (; index < trailingZeros; index++) {
+            primeFactorList[index] = 2;
+        }
+        return index;
     }
 
     @Override
@@ -145,6 +140,14 @@ public class LemireTrialDivision implements TrialDivisionAlgorithm {
     @Override
     public int getPrimeFactor(int primeFactorIndex) {
         return primes[primeFactorIndex];
+    }
+
+    @Override
+    public long[] findAllPrimeFactors(long number) {
+        // TODO add a performance Test here.
+        int maxPrimeFactor = (int) (Math.sqrt(number) + 1);
+        return findAllPrimeFactors(number, maxPrimeFactor).sortedPrimeFactors;
+
     }
 
     public boolean hasPrimeFactor(long number, int primeIndex) {

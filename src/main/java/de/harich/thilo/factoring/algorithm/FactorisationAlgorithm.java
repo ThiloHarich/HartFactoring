@@ -15,4 +15,7 @@ public interface FactorisationAlgorithm {
         return this.getClass().getSimpleName();
 
     }
+    default boolean isPrime(long number){
+        return findSingleFactor(number) == NO_FACTOR_FOUND;
+    }
 }

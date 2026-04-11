@@ -93,7 +93,9 @@ public class SmallPrimes {
         if (Files.exists(path) && readFromFile)
             try {
                 ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream((file)));
-                semiPrimes = (long[]) inputStream.readObject();
+                long[] semiPrimesFromFile = (long[]) inputStream.readObject();
+                // keep the size
+                System.arraycopy(semiPrimesFromFile, 0, semiPrimes, 0, semiPrimes.length);
 
 //			List<String> semiPrimeList = Files.readAllLines(path);
 //			System.out.println("found " + semiPrimes.length + " semi primes in file "+ path);

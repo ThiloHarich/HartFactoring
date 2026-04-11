@@ -10,12 +10,13 @@ public class ScalarTrialDivision implements TrialDivisionAlgorithm {
     public ScalarTrialDivision() {
     }
 
-    public long[] findAllPrimeFactors(long numberToFactorize, int maxPrimeFactor) {
+    public long[] findAllPrimeFactors(long numberToFactorize) {
         int numberBits = Long.SIZE - Long.numberOfLeadingZeros(numberToFactorize);
         long[] primeFactors = new long[numberBits];
         int factorIndex = 0;
         int primeFactorIndex = 1;
         int primeFactor;
+        int maxPrimeFactor = (int) (Math.sqrt(numberToFactorize) + 1);
         do {
             primeFactor = getPrimeFactor(primeFactorIndex);
             // for hard numbers like big semiprimes finding a factor (early) is unlikely and JIT predicts that
@@ -28,7 +29,6 @@ public class ScalarTrialDivision implements TrialDivisionAlgorithm {
             }
             primeFactorIndex++;
         } while (primeFactor <= maxPrimeFactor);
-        primeFactors[factorIndex] = -1;
         return primeFactors;
     }
 
