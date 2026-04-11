@@ -39,11 +39,10 @@ public class FactoringController {
         List<FactoringResult> resultList = new ArrayList<>();
         String[] inputNumbers = numbers.split(",");
 
-        int i = 0;
-
-        for (Factorisation result : results){
-            String input = inputNumbers[i++].trim();
-                resultList.add(new FactoringResult(input, result.product, result.csvList));
+        for (int i = 0; i < results.size(); i++) {
+            Factorisation result = results.get(i);
+            String input = (i < inputNumbers.length) ? inputNumbers[i].trim() : "";
+            resultList.add(new FactoringResult(input, result.product, result.csvList, result.durationMs));
         }
         
         model.addAttribute("results", resultList);
@@ -60,7 +59,7 @@ public class FactoringController {
         
         for (int i = 0; i < results.size(); i++) {
             String input = (i < inputNumbers.length) ? inputNumbers[i].trim() : "";
-            resultList.add(new FactoringResult(input, results.get(i).product, results.get(i).csvList));
+            resultList.add(new FactoringResult(input, results.get(i).product, results.get(i).csvList, results.get(i).durationMs));
         }
         return resultList;
     }
@@ -69,15 +68,18 @@ public class FactoringController {
         private String input;
         private String output;
         private String csv;
+        private long durationMs;
 
-        public FactoringResult(String input, String output, String csv) {
+        public FactoringResult(String input, String output, String csv, long durationMs) {
             this.input = input;
             this.output = output;
             this.csv = csv;
+            this.durationMs = durationMs;
         }
 
         public String getInput() { return input; }
         public String getOutput() { return output; }
         public String getCsv() { return csv; }
+        public long getDurationMs() { return durationMs; }
     }
 }

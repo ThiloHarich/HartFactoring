@@ -36,23 +36,27 @@ public class FactorisationRunner {
     }
 
     public List<Factorisation> getFactorisationOutput(long number){
+        long startTime = System.currentTimeMillis();
         long[] factors = getSortedPrimeFactors(number);
+        long duration = System.currentTimeMillis() - startTime;
+        
         String factorString = toString(factors);
-//        Long product = Arrays.stream(factors).filter(f -> f > 0).reduce(1L, (a, b) -> a * b);
         String csv = toCsvString(factors);
-        System.out.println(number + " : " + factorString + "\t csv : " + csv);
-        return List.of(new Factorisation(factorString, csv));
+        System.out.println(number + " : " + factorString + "\t csv : " + csv + " duration: " + duration + "ms");
+        return List.of(new Factorisation(factorString, csv, duration));
     }
 
     public  List<Factorisation> getFactorisationOutput(long[] numbers){
         List<Factorisation> factorisationOutput = new ArrayList<>();
-        long[][] factors = getSortedPrimeFactors(numbers);
-        for (int i = 0; i < factors.length; i++) {
-            String factorString = toString(factors[i]);
-//        Long product = Arrays.stream(factors).filter(f -> f > 0).reduce(1L, (a, b) -> a * b);
-            String csv = toCsvString(factors[i]);
-            System.out.println(numbers[i] + " : " + factorString + "\t csv : " + csv);
-            factorisationOutput.add( new Factorisation(factorString, csv));
+        for (long number : numbers) {
+            long startTime = System.currentTimeMillis();
+            long[] factors = getSortedPrimeFactors(number);
+            long duration = System.currentTimeMillis() - startTime;
+
+            String factorString = toString(factors);
+            String csv = toCsvString(factors);
+            System.out.println(number + " : " + factorString + "\t csv : " + csv + " duration: " + duration + "ms");
+            factorisationOutput.add(new Factorisation(factorString, csv, duration));
         }
         return factorisationOutput;
     }

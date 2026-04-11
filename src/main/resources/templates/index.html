@@ -13,15 +13,15 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center mb-4">Hart Factoring</h1>
+        <h1 class="text-center mb-4">Java Hart Factoring</h1>
         
         <div class="card shadow-sm">
             <div class="card-body">
                 <form action="/factorize" th:action="@{/factorize}" method="post">
                     <div class="mb-3">
-                        <label for="numbers" class="form-label">Zahlen zum Faktorisieren (kommagetrennt):</label>
+                        <label for="numbers" class="form-label">numbers to factorize (comma separated up to 18 digits):</label>
                         <input type="text" class="form-control" id="numbers" name="numbers" 
-                               th:value="${input}" placeholder="z.B. 1234, 5678, 9999" required>
+                               th:value="${input}" placeholder="z.B. 1234, 5678, 7890243209895" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Faktorisieren</button>
                 </form>
@@ -29,14 +29,15 @@
         </div>
 
         <div th:if="${results}" class="card shadow-sm">
-            <div class="card-header bg-success text-white">Ergebnisse</div>
+            <div class="card-header bg-success text-white">Factorisations</div>
             <div class="card-body p-0">
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>Eingabe</th>
-                            <th>Faktoren (Exponenten)</th>
+                            <th>number</th>
+                            <th>Prime decomposition</th>
                             <th>CSV</th>
+                            <th>time in ms</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,6 +45,7 @@
                             <td th:text="${res.input}"></td>
                             <td th:text="${res.output}"></td>
                             <td th:text="${res.csv}"></td>
+                            <td th:text="${res.durationMs}"></td>
                         </tr>
                     </tbody>
                 </table>
