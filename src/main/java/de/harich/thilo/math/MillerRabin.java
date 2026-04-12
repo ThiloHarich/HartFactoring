@@ -1,5 +1,10 @@
 package de.harich.thilo.math;
 
+import java.math.BigInteger;
+
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.TWO;
+
 public class MillerRabin {
 
     /**
@@ -19,11 +24,14 @@ public class MillerRabin {
         // For n < 2^64, these bases are sufficient
         long[] bases = getBases(n);
 
-        for (long a : bases) {
-            if (n <= a) break;
-            if (!millerRabinTest(n, a, d, s)) return false;
+        if (d < Integer.MAX_VALUE) {
+            for (long a : bases) {
+                if (n <= a) break;
+                if (!millerRabinTest(n, a, d, s)) return false;
+            }
+            return true;
         }
-        return true;
+        return passesMillerRabinBig(bases, BigInteger.valueOf(n));
     }
 
     private static long[] getBases(long n) {
@@ -76,5 +84,30 @@ public class MillerRabin {
             b /= 2;
         }
         return res;
+    }
+
+    /**
+
+     */
+    private static boolean passesMillerRabinBig(long[] bases, BigInteger n) {
+        // Find a and m such that m is odd and this == 1 + 2**a * m
+        BigInteger thisMinusOne = n.subtract(ONE);
+        BigInteger m = thisMinusOne;
+        int a = m.getLowestSetBit();
+        m = m.shiftRight(a);
+
+        for (long base : bases) {
+            BigInteger b = BigInteger.valueOf(base);
+
+            // taken from Biginteger
+            int j = 0;
+            BigInteger z = b.modPow(m, n);
+            while (!((j == 0 && z.equals(ONE)) || z.equals(thisMinusOne))) {
+                if (j > 0 && z.equals(ONE) || ++j == a)
+                    return false;
+                z = z.modPow(TWO, n);
+            }
+        }
+        return true;
     }
 }

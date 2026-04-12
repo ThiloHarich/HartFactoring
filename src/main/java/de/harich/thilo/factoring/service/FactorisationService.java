@@ -31,10 +31,14 @@ public class FactorisationService {
 
     // theoretically we only have to do trial division up to n^1/3, but than hart has to
     // search longer than n^1/3. This seems to be the optimal/good value (combination)
-    private final double lemireExponent = .35;
+    private double trialDivisionExponent = .35;
 
     public FactorisationService(FactorisationType factorisationType) {
         this.factorisationType = factorisationType;
+    }
+    public FactorisationService(FactorisationType factorisationType, double trialDivisionExponent) {
+        this.factorisationType = factorisationType;
+        this.trialDivisionExponent = trialDivisionExponent;
     }
 
     LemireTrialDivision getTrialDivisionAlgorithm(long number){
@@ -66,7 +70,7 @@ public class FactorisationService {
         if (factorisationType == ELLIPTIC_CURVE_METHOD)
             return 1 << 10;
         if (factorisationType == TRIAL_DIVISION_AND_HART)
-            return (int) Math.pow(number, lemireExponent) + 1;
+            return (int) Math.pow(number, trialDivisionExponent) + 1;
         // default search for all factors
         return (int) Math.sqrt(number) + 1;
     }
@@ -78,6 +82,8 @@ public class FactorisationService {
             long sqrt = (long) Math.sqrt(number);
             decomposition.addPrimeFactor(sqrt);
             decomposition.addPrimeFactor(sqrt);
+            decomposition.factor = 1;
+            return;
         }
 
         // there is no proof that we can stop at n^1/3. Depends also on the amount of trial division
@@ -134,6 +140,14 @@ public class FactorisationService {
 //                }
             }
         }
+    }
+
+    public String getName(){
+        String name = factorisationType.getName();
+        if (trialDivisionExponent > .35){
+            name += trialDivisionExponent;
+        }
+        return name;
     }
 
 }

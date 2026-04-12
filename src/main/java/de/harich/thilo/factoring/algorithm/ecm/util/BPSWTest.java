@@ -57,9 +57,9 @@ public class BPSWTest {
         if (!N.testBit(0)) return N.equals(I_2); // even N>2 is not prime
 
         // For small N, trial division is much faster than BPSW
-        if (N.bitLength() < 32) {
-			return lemireIntTrialDivision.isPrime(N.intValue());
-        }
+//        if (N.bitLength() < 32) {
+//			return lemireIntTrialDivision.isPrime(N.intValue());
+//        }
         
 		// Test residues % 30030. Note that N<30030 have been exclude by trial division above.
 		if (!primeRestsMod30030.contains(N.mod(BIG_30030).intValue())) return false;

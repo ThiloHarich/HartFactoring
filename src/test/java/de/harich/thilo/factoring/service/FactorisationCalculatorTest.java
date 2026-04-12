@@ -17,7 +17,7 @@ public class FactorisationCalculatorTest {
 
     @Test
     public void testFactorisationCorrectness(){
-        FactorisationService factorization = new FactorisationService(TRIAL_DIVISION_AND_HART);
+        FactorisationService factorization = new FactorisationService(TRIAL_DIVISION_AND_HART, 0.35);
 //        int fromIndex = (int) 1L << 20;
         int fromIndex = 235133;
         int length = 1000;
@@ -40,8 +40,8 @@ public class FactorisationCalculatorTest {
         // TODO  cross over should be at prime (n^1/3) ~ n^(1/3) * log(n^1/3)
         // ~ n^(1/3) * const * numberBits(n^1/3)
         FactorisationService[] calculators = {
-                new FactorisationService(TRIAL_DIVISION_ONLY),
-                new FactorisationService(TRIAL_DIVISION_AND_HART),
+                new FactorisationService(TRIAL_DIVISION_ONLY, 0.35),
+                new FactorisationService(TRIAL_DIVISION_AND_HART, 0.35),
         } ;
 
 

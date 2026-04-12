@@ -24,7 +24,7 @@ public class SqrtArraySquareSubtraction
     long baseMultiplier = 3*3*5*7;
 
     // 21 BIT should be enough for number around 21*3 = 63 BIT = unsigned long
-    protected static final int MULTIPLIERS_LIMIT_50_BIT = 1 << 20;
+    protected static final int MULTIPLIERS_LIMIT_50_BIT = 1 << 21;
 
     // SIMD/AVX operations work on arrays, here it is. Let the JIT do the optimization
     private static double [] sqrtMultiplier;

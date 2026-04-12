@@ -6,11 +6,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class FactoringController {
+
+    private static final DecimalFormat SECONDS_FORMAT = new DecimalFormat("0.000000000");
 
     @Autowired
     private FactorisationRunner factorisationRunner;
@@ -42,7 +45,7 @@ public class FactoringController {
         for (int i = 0; i < results.size(); i++) {
             Factorisation result = results.get(i);
             String input = (i < inputNumbers.length) ? inputNumbers[i].trim() : "";
-            resultList.add(new FactoringResult(input, result.product, result.csvList, result.durationMs));
+            resultList.add(new FactoringResult(input, result.product, result.csvList, SECONDS_FORMAT.format(result.seconds)));
         }
         
         model.addAttribute("results", resultList);
@@ -59,7 +62,8 @@ public class FactoringController {
         
         for (int i = 0; i < results.size(); i++) {
             String input = (i < inputNumbers.length) ? inputNumbers[i].trim() : "";
-            resultList.add(new FactoringResult(input, results.get(i).product, results.get(i).csvList, results.get(i).durationMs));
+            String seconds = SECONDS_FORMAT.format(results.get(i).seconds);
+            resultList.add(new FactoringResult(input, results.get(i).product, results.get(i).csvList, seconds));
         }
         return resultList;
     }
@@ -68,18 +72,18 @@ public class FactoringController {
         private String input;
         private String output;
         private String csv;
-        private long durationMs;
+        private String seconds;
 
-        public FactoringResult(String input, String output, String csv, long durationMs) {
+        public FactoringResult(String input, String output, String csv, String seconds) {
             this.input = input;
             this.output = output;
             this.csv = csv;
-            this.durationMs = durationMs;
+            this.seconds = seconds;
         }
 
         public String getInput() { return input; }
         public String getOutput() { return output; }
         public String getCsv() { return csv; }
-        public long getDurationMs() { return durationMs; }
+        public String getSeconds() { return seconds; }
     }
 }

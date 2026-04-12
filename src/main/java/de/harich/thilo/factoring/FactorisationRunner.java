@@ -21,7 +21,7 @@ public class FactorisationRunner {
     private final NumberValidator numberValidator;
 
     public FactorisationRunner() {
-        this.factorisationService = new FactorisationService(TRIAL_DIVISION_AND_HART);
+        this.factorisationService = new FactorisationService(TRIAL_DIVISION_AND_HART, 0.35);
         this.numberValidator = new NumberValidator();
     }
 
@@ -36,22 +36,22 @@ public class FactorisationRunner {
     }
 
     public List<Factorisation> getFactorisationOutput(long number){
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         long[] factors = getSortedPrimeFactors(number);
-        long duration = System.currentTimeMillis() - startTime;
+        long duration = System.nanoTime() - startTime;
         
         String factorString = toString(factors);
         String csv = toCsvString(factors);
-        System.out.println(number + " : " + factorString + "\t csv : " + csv + " duration: " + duration + "ms");
+        System.out.println(number + " : " + factorString + "\t csv : " + csv + " duration: " + duration + " nano seconds");
         return List.of(new Factorisation(factorString, csv, duration));
     }
 
     public  List<Factorisation> getFactorisationOutput(long[] numbers){
         List<Factorisation> factorisationOutput = new ArrayList<>();
         for (long number : numbers) {
-            long startTime = System.currentTimeMillis();
+            long startTime = System.nanoTime();
             long[] factors = getSortedPrimeFactors(number);
-            long duration = System.currentTimeMillis() - startTime;
+            long duration = System.nanoTime() - startTime;
 
             String factorString = toString(factors);
             String csv = toCsvString(factors);

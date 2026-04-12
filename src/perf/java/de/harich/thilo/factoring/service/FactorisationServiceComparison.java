@@ -17,8 +17,11 @@ public class FactorisationServiceComparison {
     public static void main(String[] args) {
         int bits = 45;
         FactorisationService[] calculators = {
+                new FactorisationService(TRIAL_DIVISION_AND_HART, 0.36),
                 // use lemire up to exponent and switch to hart
-                new FactorisationService(TRIAL_DIVISION_AND_HART),
+                new FactorisationService(TRIAL_DIVISION_AND_HART, 0.35),
+
+
                 // always use Lemire
                 new FactorisationService(TRIAL_DIVISION_ONLY),
         };
@@ -61,7 +64,7 @@ public class FactorisationServiceComparison {
     public static void compareSuccessiveNumbers(int bits, FactorisationService[] calculators) {
         Random random = new Random();
         long base = random.nextLong(1L << bits);
-//        long base = 25623374941L;
+//        base = 23880836102162L;
         double hartAlgorithmExponent = 0.3;
         double expectedTimePerNumber = Math.pow(base, hartAlgorithmExponent);
         int successiveCount = (int) (RUNNING_TIME / expectedTimePerNumber);
@@ -91,7 +94,7 @@ public class FactorisationServiceComparison {
 
             double relativeTime = overallMin == Long.MAX_VALUE ? 1 : ((double) times[i]) / overallMin;
             double relativeToLast = times[i] / (lastTime + 0.0);
-            final String name = String.format("%-75s", calculators[i].factorisationType.getName());
+            final String name = String.format("%-75s", calculators[i].getName());
             System.out.println(name + "  :    \t" + times[i] + " \t " + relativeTime + "\t " + relativeToLast);
         }
     }
